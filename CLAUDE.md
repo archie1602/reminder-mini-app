@@ -9,7 +9,6 @@ This is a Telegram Mini App built with React, TypeScript, and Vite. It demonstra
 **Key Technologies:**
 - React 18 with TypeScript
 - [@telegram-apps/sdk-react](https://docs.telegram-mini-apps.com/packages/telegram-apps-sdk-react) for Telegram integration
-- [@telegram-apps/telegram-ui](https://github.com/Telegram-Mini-Apps/TelegramUI) for UI components
 - Vite for build tooling
 - React Router (HashRouter) for client-side routing
 
@@ -76,7 +75,7 @@ npm run deploy
 ### Component Architecture
 
 - **[src/components/Root.tsx](src/components/Root.tsx)** - Wraps app with SDKProvider and ErrorBoundary
-- **[src/components/App.tsx](src/components/App.tsx)** - Main router component with AppRoot wrapper
+- **[src/components/App.tsx](src/components/App.tsx)** - Main router component
 - **[src/components/ErrorBoundary.tsx](src/components/ErrorBoundary.tsx)** - Error handling boundary
 - Pages in `src/pages/` directory correspond to routes
 

@@ -1,5 +1,4 @@
 import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
-import { List } from '@telegram-apps/telegram-ui';
 import { type FC, useMemo } from 'react';
 
 import { DisplayData } from '@/components/DisplayData/DisplayData.tsx';
@@ -10,7 +9,7 @@ export const LaunchParamsPage: FC = () => {
 
   return (
     <Page>
-      <List>
+      <div>
         <DisplayData
           rows={[
             { title: 'tgWebAppPlatform', value: lp.tgWebAppPlatform },
@@ -22,7 +21,7 @@ export const LaunchParamsPage: FC = () => {
             { title: 'tgWebAppThemeParams', type: 'link', value: '/theme-params' },
           ]}
         />
-      </List>
+      </div>
     </Page>
   );
 };
