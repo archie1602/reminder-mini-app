@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite'
 import tsconfigPaths from 'vite-tsconfig-paths';
 import react from '@vitejs/plugin-react-swc';
 import mkcert from 'vite-plugin-mkcert';
@@ -24,6 +25,7 @@ export default defineConfig({
     // Using this plugin requires admin rights on the first dev-mode launch.
     // https://www.npmjs.com/package/vite-plugin-mkcert
     process.env.HTTPS && mkcert(),
+    tailwindcss(),
   ],
   build: {
     target: 'esnext',
