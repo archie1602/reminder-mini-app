@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "homepage": "https://telegram-mini-apps.github.io/reactjs-template",
+  "homepage": "https://archie1602.github.io/reminder-mini-app",
   "scripts": {
     "deploy": "gh-pages -d dist",
     "dev": "vite",
@@ -15,13 +15,22 @@
     "predeploy": "npm run build"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/vite": "^4.1.14",
+    "@tanstack/react-query": "^5.90.2",
     "@telegram-apps/sdk-react": "^3.3.6",
+    "axios": "^1.12.2",
+    "dayjs": "^1.11.18",
     "eruda": "^3.4.3",
+    "i18next": "^25.5.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.64.0",
+    "react-i18next": "^16.0.0",
     "react-router-dom": "^6.30.1",
-    "tailwindcss": "^4.1.14"
+    "sonner": "^2.0.7",
+    "tailwindcss": "^4.1.14",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
@@ -43,5 +52,10 @@
     "vite": "^6.3.5",
     "vite-plugin-mkcert": "^1.17.8",
     "vite-tsconfig-paths": "^5.1.4"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
