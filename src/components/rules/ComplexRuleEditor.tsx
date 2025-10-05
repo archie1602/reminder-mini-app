@@ -59,7 +59,18 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
   const updateTimeMode = (mode: RuleTimeMode) => {
     onChange({
       ...value,
-      time: { mode, at: null, stepRange: undefined },
+      time: {
+        mode,
+        at: mode === RuleTimeMode.ExactTime ? '09:00:00' : null,
+        stepRange:
+          mode === RuleTimeMode.Range
+            ? {
+                from: '09:00:00',
+                to: '17:00:00',
+                step: { every: 1, unit: TimeUnit.Hours },
+              }
+            : undefined,
+      },
     });
   };
 
@@ -223,10 +234,11 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
                     time: {
                       ...value.time,
                       stepRange: {
-                        ...value.time.stepRange!,
+                        from: value.time.stepRange?.from || '09:00:00',
+                        to: value.time.stepRange?.to || '17:00:00',
                         step: {
-                          ...value.time.stepRange!.step,
                           every: parseInt(e.target.value) || 1,
+                          unit: value.time.stepRange?.step?.unit || TimeUnit.Hours,
                         },
                       },
                     },
@@ -244,9 +256,10 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
                     time: {
                       ...value.time,
                       stepRange: {
-                        ...value.time.stepRange!,
+                        from: value.time.stepRange?.from || '09:00:00',
+                        to: value.time.stepRange?.to || '17:00:00',
                         step: {
-                          ...value.time.stepRange!.step,
+                          every: value.time.stepRange?.step?.every || 1,
                           unit: e.target.value as TimeUnit,
                         },
                       },
