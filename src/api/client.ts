@@ -2,7 +2,7 @@ import axios from 'axios';
 import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
 
 const apiClient = axios.create({
-  baseURL: '/v1',
+  baseURL: 'https://m6cptfvk-5119.euw.devtunnels.ms/v1',
   headers: {
     'Content-Type': 'application/json',
   },
