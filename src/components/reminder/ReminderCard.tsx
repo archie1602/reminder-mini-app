@@ -26,8 +26,7 @@ export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
     }
   };
 
-  const schedule = reminder.schedules?.[0];
-  const ruleSummary = schedule ? humanizeRule(schedule.rule, t) : '';
+  const schedules = reminder.schedules || [];
 
   return (
     <Card>
@@ -47,8 +46,17 @@ export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
           </span>
         </div>
 
-        {ruleSummary && (
-          <p className="text-sm text-[var(--tg-theme-hint-color)]">{ruleSummary}</p>
+        {schedules.length > 0 && (
+          <div className="space-y-2">
+            {schedules.map((schedule) => (
+              <div key={schedule.id} className="text-sm text-[var(--tg-theme-hint-color)] flex items-start">
+                {schedules.length > 1 && (
+                  <span className="text-[var(--tg-theme-text-color)] mr-2 mt-0.5">•</span>
+                )}
+                <span>{humanizeRule(schedule.rule, t)}</span>
+              </div>
+            ))}
+          </div>
         )}
 
         <div className="flex gap-2 mt-4">

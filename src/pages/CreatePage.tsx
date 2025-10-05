@@ -1,7 +1,7 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createReminderSchema, CreateReminderFormData } from '@/schemas/reminder.schema';
 import { useCreateReminder } from '@/hooks/useReminders';
@@ -9,22 +9,15 @@ import { useTelegramMainButton } from '@/hooks/useTelegramMainButton';
 import { useTelegramBackButton } from '@/hooks/useTelegramBackButton';
 import { Textarea } from '@/components/shared/Textarea';
 import { Button } from '@/components/shared/Button';
-import { Select } from '@/components/shared/Select';
-import { Segmented } from '@/components/shared/Segmented';
-import { OneTimeRuleEditor } from '@/components/rules/OneTimeRuleEditor';
-import { IntervalRuleEditor } from '@/components/rules/IntervalRuleEditor';
-import { ComplexRuleEditor } from '@/components/rules/ComplexRuleEditor';
-import { RuleType, RuleDateMode, RuleTimeMode, TimeUnit } from '@/api/types';
-import { commonTimezones, getDefaultTimezone } from '@/utils/timezones';
+import { ScheduleEditor } from '@/components/reminder/ScheduleEditor';
+import { RuleType } from '@/api/types';
+import { getDefaultTimezone } from '@/utils/timezones';
 import dayjs from 'dayjs';
 
 export const CreatePage: FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const createMutation = useCreateReminder();
-
-  const [ruleType, setRuleType] = useState<RuleType>(RuleType.OneTime);
-  const [timezone, setTimezone] = useState(getDefaultTimezone());
 
   const {
     control,
@@ -40,7 +33,7 @@ export const CreatePage: FC = () => {
       schedules: [
         {
           type: RuleType.OneTime,
-          timeZone: timezone,
+          timeZone: getDefaultTimezone(),
           rule: {
             type: RuleType.OneTime,
             oneTime: {
@@ -50,6 +43,11 @@ export const CreatePage: FC = () => {
         },
       ],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'schedules',
   });
 
   const onSubmit = async (data: CreateReminderFormData) => {
@@ -65,40 +63,18 @@ export const CreatePage: FC = () => {
     visible: true,
   });
 
-  const handleRuleTypeChange = (newType: string) => {
-    const type = newType as RuleType;
-    setRuleType(type);
-
-    let newRule;
-    switch (type) {
-      case RuleType.OneTime:
-        newRule = {
-          type: RuleType.OneTime,
-          oneTime: { fireAt: dayjs().add(1, 'hour').toISOString() },
-        };
-        break;
-      case RuleType.Interval:
-        newRule = {
-          type: RuleType.Interval,
-          interval: { every: 1, unit: TimeUnit.Hours },
-        };
-        break;
-      case RuleType.Complex:
-        newRule = {
-          type: RuleType.Complex,
-          complex: {
-            date: { mode: RuleDateMode.Daily },
-            time: { mode: RuleTimeMode.ExactTime, at: '09:00:00' },
-          },
-        };
-        break;
-    }
-
-    setValue('schedules.0.rule', newRule, { shouldValidate: true });
-    setValue('schedules.0.type', type, { shouldValidate: true });
+  const handleAddSchedule = () => {
+    append({
+      type: RuleType.OneTime,
+      timeZone: getDefaultTimezone(),
+      rule: {
+        type: RuleType.OneTime,
+        oneTime: {
+          fireAt: dayjs().add(1, 'hour').toISOString(),
+        },
+      },
+    });
   };
-
-  const currentRule = watch('schedules.0.rule');
 
   return (
     <div className="min-h-screen bg-[var(--tg-theme-bg-color)] p-4 pb-20">
@@ -122,53 +98,28 @@ export const CreatePage: FC = () => {
             )}
           />
 
-          <Segmented
-            label={t('rule.type')}
-            options={[
-              { value: RuleType.OneTime, label: t('rule.oneTime') },
-              { value: RuleType.Interval, label: t('rule.interval') },
-              { value: RuleType.Complex, label: t('rule.complex') },
-            ]}
-            value={ruleType}
-            onChange={handleRuleTypeChange}
-          />
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-[var(--tg-theme-text-color)]">
+                {t('reminder.schedules')}
+              </h2>
+              <Button variant="secondary" onClick={handleAddSchedule} className="text-sm py-1 px-3" type="button">
+                {t('common.addSchedule')}
+              </Button>
+            </div>
 
-          {ruleType === RuleType.OneTime && currentRule.oneTime && (
-            <OneTimeRuleEditor
-              value={currentRule.oneTime}
-              onChange={(oneTime) =>
-                setValue('schedules.0.rule.oneTime', oneTime, { shouldValidate: true })
-              }
-            />
-          )}
-
-          {ruleType === RuleType.Interval && currentRule.interval && (
-            <IntervalRuleEditor
-              value={currentRule.interval}
-              onChange={(interval) =>
-                setValue('schedules.0.rule.interval', interval, { shouldValidate: true })
-              }
-            />
-          )}
-
-          {ruleType === RuleType.Complex && currentRule.complex && (
-            <ComplexRuleEditor
-              value={currentRule.complex}
-              onChange={(complex) =>
-                setValue('schedules.0.rule.complex', complex, { shouldValidate: true })
-              }
-            />
-          )}
-
-          <Select
-            label={t('reminder.timezone')}
-            options={commonTimezones}
-            value={timezone}
-            onChange={(e) => {
-              setTimezone(e.target.value);
-              setValue('schedules.0.timeZone', e.target.value);
-            }}
-          />
+            {fields.map((field, index) => (
+              <ScheduleEditor
+                key={field.id}
+                index={index}
+                control={control}
+                setValue={setValue}
+                watch={watch}
+                onRemove={() => remove(index)}
+                showRemoveButton={fields.length > 1}
+              />
+            ))}
+          </div>
 
           <Button
             onClick={handleSubmit(onSubmit)}
