@@ -14,7 +14,7 @@ import { Segmented } from '@/components/shared/Segmented';
 import { OneTimeRuleEditor } from '@/components/rules/OneTimeRuleEditor';
 import { IntervalRuleEditor } from '@/components/rules/IntervalRuleEditor';
 import { ComplexRuleEditor } from '@/components/rules/ComplexRuleEditor';
-import { SkeletonCard } from '@/components/shared/Skeleton';
+import { SkeletonForm, FadeIn } from '@/components/shared/Skeleton';
 import { RuleType, RuleDateMode, RuleTimeMode, TimeUnit } from '@/api/types';
 import { commonTimezones, getDefaultTimezone } from '@/utils/timezones';
 
@@ -57,7 +57,7 @@ export const EditPage: FC = () => {
         ],
       });
     }
-  }, [reminder, reset, timezone]);
+  }, [reminder, reset]);
 
   const onSubmit = async (data: CreateReminderFormData) => {
     if (!id) return;
@@ -124,94 +124,95 @@ export const EditPage: FC = () => {
 
   if (isLoading || !reminder) {
     return (
-      <div className="min-h-screen bg-[var(--tg-theme-bg-color)] p-4">
-        <div className="max-w-2xl mx-auto space-y-4">
-          <SkeletonCard />
-          <SkeletonCard />
+      <div className="min-h-screen bg-[var(--tg-theme-bg-color)] p-4 pb-20">
+        <div className="max-w-2xl mx-auto">
+          <SkeletonForm />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--tg-theme-bg-color)] p-4 pb-20">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-[var(--tg-theme-text-color)] mb-6">
-          {t('reminder.editTitle')}
-        </h1>
+    <FadeIn>
+      <div className="min-h-screen bg-[var(--tg-theme-bg-color)] p-4 pb-20">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-2xl font-bold text-[var(--tg-theme-text-color)] mb-6">
+            {t('reminder.editTitle')}
+          </h1>
 
-        <form className="space-y-6">
-          <Controller
-            name="text"
-            control={control}
-            render={({ field }) => (
-              <Textarea
-                {...field}
-                label={t('reminder.text')}
-                placeholder={t('reminder.textPlaceholder')}
-                error={errors.text?.message ? t(errors.text.message) : undefined}
-                rows={3}
+          <form className="space-y-6">
+            <Controller
+              name="text"
+              control={control}
+              render={({ field }) => (
+                <Textarea
+                  {...field}
+                  label={t('reminder.text')}
+                  placeholder={t('reminder.textPlaceholder')}
+                  error={errors.text?.message ? t(errors.text.message) : undefined}
+                  rows={3}
+                />
+              )}
+            />
+
+            <Segmented
+              label={t('rule.type')}
+              options={[
+                { value: RuleType.OneTime, label: t('rule.oneTime') },
+                { value: RuleType.Interval, label: t('rule.interval') },
+                { value: RuleType.Complex, label: t('rule.complex') },
+              ]}
+              value={ruleType}
+              onChange={handleRuleTypeChange}
+            />
+
+            {currentRule && ruleType === RuleType.OneTime && currentRule.oneTime && (
+              <OneTimeRuleEditor
+                value={currentRule.oneTime}
+                onChange={(oneTime) =>
+                  setValue('schedules.0.rule.oneTime', oneTime, { shouldValidate: true })
+                }
               />
             )}
-          />
 
-          <Segmented
-            label={t('rule.type')}
-            options={[
-              { value: RuleType.OneTime, label: t('rule.oneTime') },
-              { value: RuleType.Interval, label: t('rule.interval') },
-              { value: RuleType.Complex, label: t('rule.complex') },
-            ]}
-            value={ruleType}
-            onChange={handleRuleTypeChange}
-          />
+            {currentRule && ruleType === RuleType.Interval && currentRule.interval && (
+              <IntervalRuleEditor
+                value={currentRule.interval}
+                onChange={(interval) =>
+                  setValue('schedules.0.rule.interval', interval, { shouldValidate: true })
+                }
+              />
+            )}
 
-          {currentRule && ruleType === RuleType.OneTime && currentRule.oneTime && (
-            <OneTimeRuleEditor
-              value={currentRule.oneTime}
-              onChange={(oneTime) =>
-                setValue('schedules.0.rule.oneTime', oneTime, { shouldValidate: true })
-              }
+            {currentRule && ruleType === RuleType.Complex && currentRule.complex && (
+              <ComplexRuleEditor
+                value={currentRule.complex}
+                onChange={(complex) =>
+                  setValue('schedules.0.rule.complex', complex, { shouldValidate: true })
+                }
+              />
+            )}
+
+            <Select
+              label={t('reminder.timezone')}
+              options={commonTimezones}
+              value={timezone}
+              onChange={(e) => {
+                setTimezone(e.target.value);
+                setValue('schedules.0.timeZone', e.target.value);
+              }}
             />
-          )}
 
-          {currentRule && ruleType === RuleType.Interval && currentRule.interval && (
-            <IntervalRuleEditor
-              value={currentRule.interval}
-              onChange={(interval) =>
-                setValue('schedules.0.rule.interval', interval, { shouldValidate: true })
-              }
-            />
-          )}
-
-          {currentRule && ruleType === RuleType.Complex && currentRule.complex && (
-            <ComplexRuleEditor
-              value={currentRule.complex}
-              onChange={(complex) =>
-                setValue('schedules.0.rule.complex', complex, { shouldValidate: true })
-              }
-            />
-          )}
-
-          <Select
-            label={t('reminder.timezone')}
-            options={commonTimezones}
-            value={timezone}
-            onChange={(e) => {
-              setTimezone(e.target.value);
-              setValue('schedules.0.timeZone', e.target.value);
-            }}
-          />
-
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            disabled={!isValid || updateMutation.isPending}
-            fullWidth
-          >
-            {t('common.save')}
-          </Button>
-        </form>
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              disabled={!isValid || updateMutation.isPending}
+              fullWidth
+            >
+              {t('common.save')}
+            </Button>
+          </form>
+        </div>
       </div>
-    </div>
+    </FadeIn>
   );
 };
