@@ -1,5 +1,25 @@
-// Simplified hook - Telegram BackButton integration can be added later
-export const useTelegramBackButton = (_onBack?: () => void) => {
-  // Placeholder for Telegram BackButton integration
-  // Will be implemented with proper SDK usage later
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { showBackButton, hideBackButton, onBackButtonClick } from '@telegram-apps/sdk-react';
+
+export const useTelegramBackButton = (onBack?: () => void) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleClick = () => {
+      if (onBack) {
+        onBack();
+      } else {
+        navigate('/');
+      }
+    };
+
+    showBackButton();
+    const cleanup = onBackButtonClick(handleClick);
+
+    return () => {
+      cleanup();
+      hideBackButton();
+    };
+  }, [navigate, onBack]);
 };
