@@ -58,17 +58,17 @@ export interface RuleInterval {
 
 export interface RuleDate {
   mode: RuleDateMode;
-  at?: string | null; // ISO date string
-  range?: DateOnlyRange;
-  weekDays?: number[] | null; // 1-7 (Monday-Sunday)
-  monthDays?: number[] | null; // 1-31
-  months?: number[] | null; // 1-12
+  at?: string | null | undefined; // ISO date string
+  range?: DateOnlyRange | null | undefined;
+  weekDays?: number[] | null | undefined; // 1-7 (Monday-Sunday)
+  monthDays?: number[] | null | undefined; // 1-31
+  months?: number[] | null | undefined; // 1-12
 }
 
 export interface RuleTime {
   mode: RuleTimeMode;
-  at?: string | null; // ISO time string (HH:mm:ss)
-  stepRange?: TimeOnlyWithStepRange;
+  at?: string | null | undefined; // ISO time string (HH:mm:ss)
+  stepRange?: TimeOnlyWithStepRange | null | undefined;
 }
 
 export interface RuleComplex {
@@ -78,9 +78,9 @@ export interface RuleComplex {
 
 export interface Rule {
   type: RuleType;
-  oneTime?: RuleOneTime;
-  interval?: RuleInterval;
-  complex?: RuleComplex;
+  oneTime?: RuleOneTime | null | undefined;
+  interval?: RuleInterval | null | undefined;
+  complex?: RuleComplex | null | undefined;
 }
 
 export interface ScheduleRequestDto {

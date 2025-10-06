@@ -109,7 +109,15 @@
     "invalidDatetime": "Invalid date and time",
     "invalidNumber": "Invalid number",
     "mustBePositive": "Must be a positive number",
-    "selectAtLeastOne": "Select at least one option"
+    "selectAtLeastOne": "Select at least one option",
+    "formErrors": "Please fix the following errors:",
+    "selectWeekDays": "Please select at least one day of the week",
+    "selectMonthDays": "Please select at least one day of the month",
+    "selectMonths": "Please select at least one month",
+    "invalidDateFormat": "Invalid date format (use YYYY-MM-DD)",
+    "invalidTimeFormat": "Invalid time format (use HH:MM:SS)",
+    "invalidRuleType": "Schedule configuration is incomplete",
+    "invalidTimeRange": "Please set a valid time range"
   },
   "toast": {
     "createSuccess": "Reminder created successfully",

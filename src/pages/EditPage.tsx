@@ -10,9 +10,11 @@ import { useTelegramBackButton } from '@/hooks/useTelegramBackButton';
 import { Textarea } from '@/components/shared/Textarea';
 import { Button } from '@/components/shared/Button';
 import { ScheduleEditor } from '@/components/reminder/ScheduleEditor';
+import { FormValidationSummary } from '@/components/shared/FormValidationSummary';
 import { SkeletonForm, FadeIn } from '@/components/shared/Skeleton';
 import { RuleType } from '@/api/types';
 import { getDefaultTimezone } from '@/utils/timezones';
+import { hasValidationErrors } from '@/utils/formHelpers';
 import dayjs from 'dayjs';
 
 export const EditPage: FC = () => {
@@ -25,7 +27,7 @@ export const EditPage: FC = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     setValue,
     watch,
     reset,
@@ -73,11 +75,13 @@ export const EditPage: FC = () => {
     navigate('/');
   };
 
+  const hasErrors = hasValidationErrors(errors);
+
   useTelegramBackButton();
   useTelegramMainButton({
     text: t('common.save'),
     onClick: handleSubmit(onSubmit),
-    enabled: isValid && !updateMutation.isPending,
+    enabled: !hasErrors && !updateMutation.isPending,
     visible: true,
   });
 
@@ -150,9 +154,11 @@ export const EditPage: FC = () => {
               ))}
             </div>
 
+            <FormValidationSummary errors={errors} isVisible={hasErrors} />
+
             <Button
               onClick={handleSubmit(onSubmit)}
-              disabled={!isValid || updateMutation.isPending}
+              disabled={hasErrors || updateMutation.isPending}
               fullWidth
             >
               {t('common.save')}

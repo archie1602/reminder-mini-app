@@ -8,44 +8,100 @@ const ruleTimeModeSchema = z.nativeEnum(RuleTimeMode);
 
 // Date and time range schemas
 const dateOnlyRangeSchema = z.object({
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.invalidDateFormat'),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.invalidDateFormat'),
 });
 
 const timeRangeStepSchema = z.object({
-  every: z.number().int().positive(),
+  every: z.number().int().positive('validation.mustBePositive'),
   unit: timeUnitSchema,
 });
 
 const timeOnlyWithStepRangeSchema = z.object({
-  from: z.string().regex(/^\d{2}:\d{2}:\d{2}$/),
-  to: z.string().regex(/^\d{2}:\d{2}:\d{2}$/),
+  from: z.string().regex(/^\d{2}:\d{2}:\d{2}$/, 'validation.invalidTimeFormat'),
+  to: z.string().regex(/^\d{2}:\d{2}:\d{2}$/, 'validation.invalidTimeFormat'),
   step: timeRangeStepSchema,
 });
 
 // Rule type schemas
 const ruleOneTimeSchema = z.object({
-  fireAt: z.string().datetime(),
+  fireAt: z.string().datetime('validation.invalidDatetime'),
 });
 
 const ruleIntervalSchema = z.object({
-  every: z.number().int().positive(),
+  every: z.number().int().positive('validation.mustBePositive'),
   unit: timeUnitSchema,
 });
 
 const ruleDateSchema = z.object({
   mode: ruleDateModeSchema,
-  at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
-  range: dateOnlyRangeSchema.optional(),
-  weekDays: z.array(z.number().int().min(1).max(7)).optional().nullable(),
-  monthDays: z.array(z.number().int().min(1).max(31)).optional().nullable(),
-  months: z.array(z.number().int().min(1).max(12)).optional().nullable(),
+  at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.invalidDateFormat').nullish(),
+  range: dateOnlyRangeSchema.nullish(),
+  weekDays: z.array(z.number().int().min(1).max(7)).nullish(),
+  monthDays: z.array(z.number().int().min(1).max(31)).nullish(),
+  months: z.array(z.number().int().min(1).max(12)).nullish(),
+}).superRefine((data, ctx) => {
+  // Validate based on mode
+  if (data.mode === RuleDateMode.WeekDays) {
+    if (!data.weekDays || data.weekDays.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.selectWeekDays',
+        path: ['weekDays'],
+      });
+    }
+  }
+  if (data.mode === RuleDateMode.MonthDays) {
+    if (!data.monthDays || data.monthDays.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.selectMonthDays',
+        path: ['monthDays'],
+      });
+    }
+  }
+  if (data.mode === RuleDateMode.YearDays) {
+    if (!data.months || data.months.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.selectMonths',
+        path: ['months'],
+      });
+    }
+    if (!data.monthDays || data.monthDays.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.selectMonthDays',
+        path: ['monthDays'],
+      });
+    }
+  }
 });
 
 const ruleTimeSchema = z.object({
   mode: ruleTimeModeSchema,
-  at: z.string().regex(/^\d{2}:\d{2}:\d{2}$/).optional().nullable(),
-  stepRange: timeOnlyWithStepRangeSchema.optional(),
+  at: z.string().regex(/^\d{2}:\d{2}:\d{2}$/, 'validation.invalidTimeFormat').nullish(),
+  stepRange: timeOnlyWithStepRangeSchema.nullish(),
+}).superRefine((data, ctx) => {
+  // Validate based on mode
+  if (data.mode === RuleTimeMode.ExactTime) {
+    if (!data.at) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.invalidTime',
+        path: ['at'],
+      });
+    }
+  }
+  if (data.mode === RuleTimeMode.Range) {
+    if (!data.stepRange) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.invalidTimeRange',
+        path: ['stepRange'],
+      });
+    }
+  }
 });
 
 const ruleComplexSchema = z.object({
@@ -56,9 +112,9 @@ const ruleComplexSchema = z.object({
 // Main rule schema (discriminated union)
 export const ruleSchema = z.object({
   type: z.nativeEnum(RuleType),
-  oneTime: ruleOneTimeSchema.optional(),
-  interval: ruleIntervalSchema.optional(),
-  complex: ruleComplexSchema.optional(),
+  oneTime: ruleOneTimeSchema.nullish(),
+  interval: ruleIntervalSchema.nullish(),
+  complex: ruleComplexSchema.nullish(),
 }).refine((data) => {
   // Ensure the correct property is present based on type
   if (data.type === RuleType.OneTime) return !!data.oneTime;
@@ -66,7 +122,7 @@ export const ruleSchema = z.object({
   if (data.type === RuleType.Complex) return !!data.complex;
   return false;
 }, {
-  message: 'Rule must have the corresponding property for its type',
+  message: 'validation.invalidRuleType',
 });
 
 // Schedule schemas

@@ -10,8 +10,10 @@ import { useTelegramBackButton } from '@/hooks/useTelegramBackButton';
 import { Textarea } from '@/components/shared/Textarea';
 import { Button } from '@/components/shared/Button';
 import { ScheduleEditor } from '@/components/reminder/ScheduleEditor';
+import { FormValidationSummary } from '@/components/shared/FormValidationSummary';
 import { RuleType } from '@/api/types';
 import { getDefaultTimezone } from '@/utils/timezones';
+import { hasValidationErrors } from '@/utils/formHelpers';
 import dayjs from 'dayjs';
 
 export const CreatePage: FC = () => {
@@ -22,7 +24,7 @@ export const CreatePage: FC = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     setValue,
     watch,
   } = useForm<CreateReminderFormData>({
@@ -55,11 +57,13 @@ export const CreatePage: FC = () => {
     navigate('/');
   };
 
+  const hasErrors = hasValidationErrors(errors);
+
   useTelegramBackButton();
   useTelegramMainButton({
     text: t('common.save'),
     onClick: handleSubmit(onSubmit),
-    enabled: isValid && !createMutation.isPending,
+    enabled: !hasErrors && !createMutation.isPending,
     visible: true,
   });
 
@@ -121,9 +125,11 @@ export const CreatePage: FC = () => {
             ))}
           </div>
 
+          <FormValidationSummary errors={errors} isVisible={hasErrors} />
+
           <Button
             onClick={handleSubmit(onSubmit)}
-            disabled={!isValid || createMutation.isPending}
+            disabled={hasErrors || createMutation.isPending}
             fullWidth
           >
             {t('common.save')}
