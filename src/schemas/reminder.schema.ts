@@ -25,7 +25,7 @@ const timeOnlyWithStepRangeSchema = z.object({
 
 // Rule type schemas
 const ruleOneTimeSchema = z.object({
-  fireAt: z.string().datetime('validation.invalidDatetime'),
+  fireAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, 'validation.invalidDatetime'),
 });
 
 const ruleIntervalSchema = z.object({

@@ -13,8 +13,8 @@ export const OneTimeRuleEditor: FC<OneTimeRuleEditorProps> = ({ value, onChange 
   const { t } = useTranslation();
 
   const handleDateTimeChange = (datetime: string) => {
-    // Convert to ISO datetime
-    const isoDateTime = dayjs(datetime).toISOString();
+    // Format as ISO datetime without Z suffix
+    const isoDateTime = dayjs(datetime).format('YYYY-MM-DDTHH:mm:ss');
     onChange({ fireAt: isoDateTime });
   };
 

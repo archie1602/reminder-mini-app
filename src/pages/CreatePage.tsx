@@ -38,7 +38,7 @@ export const CreatePage: FC = () => {
           rule: {
             type: RuleType.OneTime,
             oneTime: {
-              fireAt: dayjs().add(1, 'hour').toISOString(),
+              fireAt: dayjs().add(1, 'hour').format('YYYY-MM-DDTHH:mm:ss'),
             },
           },
         },
