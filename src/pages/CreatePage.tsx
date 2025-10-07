@@ -34,7 +34,6 @@ export const CreatePage: FC = () => {
       text: '',
       schedules: [
         {
-          type: RuleType.OneTime,
           timeZone: getDefaultTimezone(),
           rule: {
             type: RuleType.OneTime,
@@ -69,7 +68,6 @@ export const CreatePage: FC = () => {
 
   const handleAddSchedule = () => {
     append({
-      type: RuleType.OneTime,
       timeZone: getDefaultTimezone(),
       rule: {
         type: RuleType.OneTime,

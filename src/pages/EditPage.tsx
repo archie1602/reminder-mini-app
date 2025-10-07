@@ -47,8 +47,7 @@ export const EditPage: FC = () => {
       reset({
         text: reminder.text || '',
         schedules: reminder.schedules.map((schedule) => ({
-          type: schedule.type,
-          timeZone: getDefaultTimezone(),
+          timeZone: schedule.timeZone || getDefaultTimezone(),
           rule: schedule.rule,
         })),
       });
@@ -87,7 +86,6 @@ export const EditPage: FC = () => {
 
   const handleAddSchedule = () => {
     append({
-      type: RuleType.OneTime,
       timeZone: getDefaultTimezone(),
       rule: {
         type: RuleType.OneTime,

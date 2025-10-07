@@ -13,7 +13,8 @@
     "inactive": "Inactive",
     "retry": "Retry",
     "remove": "Remove",
-    "addSchedule": "Add Schedule"
+    "addSchedule": "Add Schedule",
+    "loadMore": "Load More"
   },
   "reminder": {
     "title": "Reminders",
@@ -123,6 +124,7 @@
     "createSuccess": "Reminder created successfully",
     "updateSuccess": "Reminder updated successfully",
     "deleteSuccess": "Reminder deleted successfully",
+    "statusChangeSuccess": "Reminder status changed successfully",
     "error": "An error occurred",
     "networkError": "Network error. Please try again."
   },

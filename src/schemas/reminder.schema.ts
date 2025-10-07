@@ -128,7 +128,6 @@ export const ruleSchema = z.object({
 // Schedule schemas
 export const scheduleRequestSchema = z.object({
   rule: ruleSchema,
-  type: z.nativeEnum(RuleType),
   timeZone: z.string().optional().nullable(),
 });
 

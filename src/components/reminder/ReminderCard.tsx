@@ -1,14 +1,14 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { GetReminderDto, ReminderStatus } from '@/api/types';
+import { UserReminderResponse, ReminderStatus } from '@/api/types';
 import { Card } from '@/components/shared/Card';
 import { Button } from '@/components/shared/Button';
 import { humanizeRule } from '@/utils/humanizeRule';
 import { useDeleteReminder } from '@/hooks/useReminders';
 
 interface ReminderCardProps {
-  reminder: GetReminderDto;
+  reminder: UserReminderResponse;
 }
 
 export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {

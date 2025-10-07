@@ -1,15 +1,30 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { remindersApi } from '@/api/reminders';
-import { CreateReminderDto, UpdateReminderDto } from '@/api/types';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import { remindersApi, GetRemindersParams } from '@/api/reminders';
+import { CreateReminderDto, UpdateReminderDto, ChangeReminderStatusDto } from '@/api/types';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
 export const REMINDERS_QUERY_KEY = ['reminders'];
 
-export const useReminders = () => {
+export const useReminders = (params?: GetRemindersParams) => {
   return useQuery({
-    queryKey: REMINDERS_QUERY_KEY,
-    queryFn: remindersApi.getAll,
+    queryKey: [...REMINDERS_QUERY_KEY, params],
+    queryFn: () => remindersApi.getAll(params),
+  });
+};
+
+export const useInfiniteReminders = (params?: Omit<GetRemindersParams, 'page'>) => {
+  return useInfiniteQuery({
+    queryKey: [...REMINDERS_QUERY_KEY, 'infinite', params],
+    queryFn: ({ pageParam = 1 }) => remindersApi.getAll({ ...params, page: pageParam }),
+    getNextPageParam: (lastPage, allPages) => {
+      // Use hasNext from API response
+      if (lastPage.hasNext) {
+        return allPages.length + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
   });
 };
 
@@ -63,6 +78,23 @@ export const useDeleteReminder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
       toast.success(t('toast.deleteSuccess'));
+    },
+    onError: () => {
+      toast.error(t('toast.error'));
+    },
+  });
+};
+
+export const useChangeReminderStatus = () => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ChangeReminderStatusDto }) =>
+      remindersApi.changeStatus(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
+      toast.success(t('toast.statusChangeSuccess'));
     },
     onError: () => {
       toast.error(t('toast.error'));

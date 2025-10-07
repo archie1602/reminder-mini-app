@@ -1,8 +1,18 @@
 // Generated from OpenAPI schema
 
 export enum ReminderStatus {
-  Inactive = 0,
-  Active = 1,
+  Active = 'ACTIVE',
+  Deactivated = 'DEACTIVATED',
+}
+
+export enum ReminderSortBy {
+  CreatedAt = 'CREATED_AT',
+  ChangedAt = 'CHANGED_AT',
+}
+
+export enum SortOrder {
+  Asc = 'ASC',
+  Desc = 'DESC',
 }
 
 export enum RuleType {
@@ -85,15 +95,17 @@ export interface Rule {
 
 export interface ScheduleRequestDto {
   rule: Rule;
-  type: RuleType;
   timeZone?: string | null;
 }
 
-export interface ScheduleResponseDto {
+export interface ReminderScheduleResponse {
   id: string; // UUID
   rule: Rule;
-  type: RuleType;
+  timeZone?: string | null;
 }
+
+// Alias for backward compatibility
+export type ScheduleResponseDto = ReminderScheduleResponse;
 
 export interface CreateReminderDto {
   text?: string | null;
@@ -110,11 +122,23 @@ export interface UpdateReminderDto {
   scheduleOperations?: UpdateReminderScheduleOperationsDto;
 }
 
-export interface GetReminderDto {
+export interface ChangeReminderStatusDto {
+  status: ReminderStatus;
+}
+
+export interface UserReminderResponse {
   id: string; // UUID
   text?: string | null;
   status: ReminderStatus;
   createdAt: string; // ISO datetime string
   updatedAt: string; // ISO datetime string
-  schedules?: ScheduleResponseDto[] | null;
+  schedules?: ReminderScheduleResponse[] | null;
+}
+
+// Alias for backward compatibility
+export type GetReminderDto = UserReminderResponse;
+
+export interface GetPagedUserRemindersQueryResponse {
+  reminders?: UserReminderResponse[] | null;
+  hasNext: boolean;
 }

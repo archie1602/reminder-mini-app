@@ -33,13 +33,12 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
   const [timezone, setTimezone] = useState(getDefaultTimezone());
 
   const currentRule = watch(`schedules.${index}.rule`);
-  const currentType = watch(`schedules.${index}.type`);
 
   useEffect(() => {
-    if (currentType) {
-      setRuleType(currentType);
+    if (currentRule?.type) {
+      setRuleType(currentRule.type);
     }
-  }, [currentType]);
+  }, [currentRule?.type]);
 
   useEffect(() => {
     const currentTimezone = watch(`schedules.${index}.timeZone`);
@@ -78,7 +77,6 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
     }
 
     setValue(`schedules.${index}.rule`, newRule, { shouldValidate: true });
-    setValue(`schedules.${index}.type`, type, { shouldValidate: true });
   };
 
   const handleRemove = () => {

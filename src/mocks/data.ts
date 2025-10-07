@@ -1,6 +1,6 @@
-import { GetReminderDto, ReminderStatus, RuleType, RuleDateMode, RuleTimeMode, TimeUnit } from '@/api/types';
+import { UserReminderResponse, ReminderStatus, RuleType, RuleDateMode, RuleTimeMode, TimeUnit } from '@/api/types';
 
-export const mockReminders: GetReminderDto[] = [
+export const mockReminders: UserReminderResponse[] = [
   {
     id: '550e8400-e29b-41d4-a716-446655440001',
     text: 'Team meeting',
@@ -10,7 +10,7 @@ export const mockReminders: GetReminderDto[] = [
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440011',
-        type: RuleType.OneTime,
+        timeZone: 'UTC',
         rule: {
           type: RuleType.OneTime,
           oneTime: {
@@ -29,7 +29,7 @@ export const mockReminders: GetReminderDto[] = [
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440012',
-        type: RuleType.Interval,
+        timeZone: 'UTC',
         rule: {
           type: RuleType.Interval,
           interval: {
@@ -49,7 +49,7 @@ export const mockReminders: GetReminderDto[] = [
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440013',
-        type: RuleType.Complex,
+        timeZone: 'UTC',
         rule: {
           type: RuleType.Complex,
           complex: {
@@ -74,7 +74,7 @@ export const mockReminders: GetReminderDto[] = [
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440014',
-        type: RuleType.Complex,
+        timeZone: 'UTC',
         rule: {
           type: RuleType.Complex,
           complex: {
@@ -94,13 +94,13 @@ export const mockReminders: GetReminderDto[] = [
   {
     id: '550e8400-e29b-41d4-a716-446655440005',
     text: 'Monthly report',
-    status: ReminderStatus.Inactive,
+    status: ReminderStatus.Deactivated,
     createdAt: '2025-01-05T05:00:00Z',
     updatedAt: '2025-01-05T05:00:00Z',
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440015',
-        type: RuleType.Complex,
+        timeZone: 'UTC',
         rule: {
           type: RuleType.Complex,
           complex: {
@@ -126,7 +126,7 @@ export const mockReminders: GetReminderDto[] = [
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440016',
-        type: RuleType.Complex,
+        timeZone: 'UTC',
         rule: {
           type: RuleType.Complex,
           complex: {
@@ -158,11 +158,11 @@ export const resetStore = () => {
   remindersStore = [...mockReminders];
 };
 
-export const addReminder = (reminder: GetReminderDto) => {
+export const addReminder = (reminder: UserReminderResponse) => {
   remindersStore.push(reminder);
 };
 
-export const updateReminder = (id: string, updates: Partial<GetReminderDto>) => {
+export const updateReminder = (id: string, updates: Partial<UserReminderResponse>) => {
   const index = remindersStore.findIndex((r) => r.id === id);
   if (index !== -1) {
     remindersStore[index] = { ...remindersStore[index], ...updates, updatedAt: new Date().toISOString() };

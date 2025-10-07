@@ -1,13 +1,27 @@
 import { http, HttpResponse } from 'msw';
-import { CreateReminderDto, GetReminderDto, ReminderStatus, UpdateReminderDto } from '@/api/types';
+import { CreateReminderDto, UserReminderResponse, ReminderStatus, UpdateReminderDto, ChangeReminderStatusDto, GetPagedUserRemindersQueryResponse } from '@/api/types';
 import { remindersStore, addReminder, updateReminder, deleteReminder, getReminder } from './data';
 
 const API_BASE = '/v1';
 
 export const handlers = [
-  // GET /v1/reminders - List all reminders
-  http.get(`${API_BASE}/reminders`, () => {
-    return HttpResponse.json(remindersStore);
+  // GET /v1/reminders - List all reminders with pagination
+  http.get(`${API_BASE}/reminders`, ({ request }) => {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedReminders = remindersStore.slice(startIndex, endIndex);
+    const hasNext = endIndex < remindersStore.length;
+
+    const response: GetPagedUserRemindersQueryResponse = {
+      reminders: paginatedReminders,
+      hasNext: hasNext,
+    };
+
+    return HttpResponse.json(response);
   }),
 
   // GET /v1/reminders/:id - Get single reminder
@@ -26,7 +40,7 @@ export const handlers = [
   http.post(`${API_BASE}/reminders`, async ({ request }) => {
     const body = await request.json() as CreateReminderDto;
 
-    const newReminder: GetReminderDto = {
+    const newReminder: UserReminderResponse = {
       id: crypto.randomUUID(),
       text: body.text || null,
       status: ReminderStatus.Active,
@@ -35,13 +49,13 @@ export const handlers = [
       schedules: body.schedules?.map(schedule => ({
         id: crypto.randomUUID(),
         rule: schedule.rule,
-        type: schedule.type,
+        timeZone: schedule.timeZone,
       })) || null,
     };
 
     addReminder(newReminder);
 
-    return HttpResponse.json(newReminder, { status: 201 });
+    return new HttpResponse(null, { status: 200 });
   }),
 
   // PATCH /v1/reminders/:id - Update reminder
@@ -54,7 +68,7 @@ export const handlers = [
       return new HttpResponse(null, { status: 404 });
     }
 
-    const updates: Partial<GetReminderDto> = {};
+    const updates: Partial<UserReminderResponse> = {};
 
     if (body.text !== undefined) {
       updates.text = body.text;
@@ -76,7 +90,7 @@ export const handlers = [
         const addedSchedules = body.scheduleOperations.add.map(schedule => ({
           id: crypto.randomUUID(),
           rule: schedule.rule,
-          type: schedule.type,
+          timeZone: schedule.timeZone,
         }));
         newSchedules = [...newSchedules, ...addedSchedules];
       }
@@ -99,6 +113,21 @@ export const handlers = [
     }
 
     deleteReminder(id as string);
+
+    return new HttpResponse(null, { status: 200 });
+  }),
+
+  // PATCH /v1/reminders/:id/status - Change reminder status
+  http.patch(`${API_BASE}/reminders/:id/status`, async ({ params, request }) => {
+    const { id } = params;
+    const body = await request.json() as ChangeReminderStatusDto;
+    const reminder = getReminder(id as string);
+
+    if (!reminder) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    updateReminder(id as string, { status: body.status });
 
     return new HttpResponse(null, { status: 200 });
   }),
