@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import { StrictMode } from 'react';
-import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
+import { retrieveLaunchParams, initData } from '@telegram-apps/sdk-react';
 
 import { Root } from '@/components/Root.tsx';
 import { EnvUnsupported } from '@/components/EnvUnsupported.tsx';
@@ -8,6 +8,7 @@ import { init } from '@/init.ts';
 import i18n from '@/i18n';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ru';
 
 import './index.css';
@@ -17,6 +18,7 @@ import './mockEnv.ts';
 
 // Configure dayjs
 dayjs.extend(localizedFormat);
+dayjs.extend(relativeTime);
 
 // Initialize MSW for development only
 async function enableMocking() {
@@ -40,18 +42,42 @@ try {
   const debug = (launchParams.tgWebAppStartParam || '').includes('platformer_debug')
     || import.meta.env.DEV;
 
-  // Set language from Telegram
-  const language = 'en'; // Default to English, will be enhanced later with proper Telegram init data
-  const supportedLanguage = language.startsWith('ru') ? 'ru' : 'en';
-  i18n.changeLanguage(supportedLanguage);
-  dayjs.locale(supportedLanguage);
-
-  // Configure all application dependencies.
+  // Configure all application dependencies first (this calls restoreInitData)
   await init({
     debug,
     eruda: debug && ['ios', 'android'].includes(platform),
     mockForMacOS: platform === 'macos',
   });
+
+  // Now set language from Telegram user's language_code (after initData is restored)
+  let language = 'en'; // Default to English
+  try {
+    const initDataState = initData.state();
+
+    // Get language_code from Telegram user data
+    const languageCode = initDataState?.user?.language_code;
+
+    if (languageCode) {
+      language = languageCode;
+    } 
+  } catch (e) {
+    // If initData is not available (dev mode or error), use default
+    console.error('Using default language (initData not available)', e);
+  }
+
+  // Map language code to supported languages (currently 'en' and 'ru')
+  // For any Russian variant (ru, ru-RU, etc.), use 'ru', otherwise default to 'en'
+  const supportedLanguages = ['en', 'ru'];
+  let supportedLanguage = 'en';
+
+  if (language.toLowerCase().startsWith('ru')) {
+    supportedLanguage = 'ru';
+  } else if (supportedLanguages.includes(language)) {
+    supportedLanguage = language;
+  }
+
+  i18n.changeLanguage(supportedLanguage);
+  dayjs.locale(supportedLanguage);
 
   root.render(
     <StrictMode>

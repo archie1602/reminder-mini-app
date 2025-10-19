@@ -16,6 +16,7 @@ import {
   getEditWarningMessage
 } from '@/utils/reminderHelpers';
 import { ConfirmationModal } from '@/components/modals/ConfirmationModal';
+import { NextRunAt } from '@/components/reminder/NextRunAt';
 
 interface ReminderCardProps {
   reminder: UserReminderResponse;
@@ -102,6 +103,10 @@ export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
               </div>
             ))}
           </div>
+        )}
+
+        {reminder.status === ReminderState.Active && reminder.nextRunAt && (
+          <NextRunAt nextRunAt={reminder.nextRunAt} timeZone={reminder.timeZone} />
         )}
 
         {statusMessage && (

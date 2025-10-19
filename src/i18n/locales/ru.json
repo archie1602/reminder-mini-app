@@ -29,6 +29,7 @@
     "textPlaceholder": "Введите текст напоминания",
     "timezone": "Часовой пояс",
     "nextFire": "Следующее напоминание",
+    "nextRunAtCombined": "Следующее напоминание: {{datetime}} ({{relative}})",
     "status": "Статус",
     "noReminders": "Пока нет напоминаний",
     "createFirst": "Создайте Ваше первое напоминание",

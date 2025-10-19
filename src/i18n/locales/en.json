@@ -29,6 +29,7 @@
     "textPlaceholder": "Enter reminder text",
     "timezone": "Timezone",
     "nextFire": "Next reminder",
+    "nextRunAtCombined": "Next reminder: {{datetime}} ({{relative}})",
     "status": "Status",
     "noReminders": "No reminders yet",
     "createFirst": "Create your first reminder",
