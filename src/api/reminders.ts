@@ -3,10 +3,14 @@ import {
   CreateReminderDto,
   UserReminderResponse,
   UpdateReminderDto,
-  ChangeReminderStatusDto,
   ReminderSortBy,
   SortOrder,
-  GetPagedUserRemindersQueryResponse
+  GetPagedUserRemindersQueryResponse,
+  ReminderCreatedResponseDto,
+  UpdateUserReminderCommandResponse,
+  PauseUserReminderCommandResponse,
+  ActivatePausedReminderCommandResponse,
+  ConvertEndedReminderToDraftCommandResponse
 } from './types';
 
 export interface GetRemindersParams {
@@ -43,19 +47,32 @@ export const remindersApi = {
     return response.data;
   },
 
-  create: async (data: CreateReminderDto): Promise<void> => {
-    await apiClient.post('/reminders', data);
+  create: async (data: CreateReminderDto): Promise<ReminderCreatedResponseDto> => {
+    const response = await apiClient.post<ReminderCreatedResponseDto>('/reminders', data);
+    return response.data;
   },
 
-  update: async (id: string, data: UpdateReminderDto): Promise<void> => {
-    await apiClient.patch(`/reminders/${id}`, data);
+  update: async (id: string, data: UpdateReminderDto): Promise<UpdateUserReminderCommandResponse> => {
+    const response = await apiClient.patch<UpdateUserReminderCommandResponse>(`/reminders/${id}`, data);
+    return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/reminders/${id}`);
   },
 
-  changeStatus: async (id: string, data: ChangeReminderStatusDto): Promise<void> => {
-    await apiClient.patch(`/reminders/${id}/status`, data);
+  pause: async (id: string): Promise<PauseUserReminderCommandResponse> => {
+    const response = await apiClient.patch<PauseUserReminderCommandResponse>(`/reminders/${id}/pause`);
+    return response.data;
+  },
+
+  activate: async (id: string): Promise<ActivatePausedReminderCommandResponse> => {
+    const response = await apiClient.patch<ActivatePausedReminderCommandResponse>(`/reminders/${id}/activate`);
+    return response.data;
+  },
+
+  convertToDraft: async (id: string): Promise<ConvertEndedReminderToDraftCommandResponse> => {
+    const response = await apiClient.patch<ConvertEndedReminderToDraftCommandResponse>(`/reminders/${id}/convert-to-draft`);
+    return response.data;
   },
 };

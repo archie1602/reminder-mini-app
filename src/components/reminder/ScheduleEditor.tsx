@@ -2,14 +2,12 @@ import { FC, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { CreateReminderFormData } from '@/schemas/reminder.schema';
-import { Select } from '@/components/shared/Select';
 import { Segmented } from '@/components/shared/Segmented';
 import { Button } from '@/components/shared/Button';
 import { OneTimeRuleEditor } from '@/components/rules/OneTimeRuleEditor';
 import { IntervalRuleEditor } from '@/components/rules/IntervalRuleEditor';
 import { ComplexRuleEditor } from '@/components/rules/ComplexRuleEditor';
 import { RuleType, RuleDateMode, RuleTimeMode, TimeUnit } from '@/api/types';
-import { commonTimezones, getDefaultTimezone } from '@/utils/timezones';
 import dayjs from 'dayjs';
 
 interface ScheduleEditorProps {
@@ -30,7 +28,6 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
 }) => {
   const { t } = useTranslation();
   const [ruleType, setRuleType] = useState<RuleType>(RuleType.OneTime);
-  const [timezone, setTimezone] = useState(getDefaultTimezone());
 
   const currentRule = watch(`schedules.${index}.rule`);
 
@@ -39,13 +36,6 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
       setRuleType(currentRule.type);
     }
   }, [currentRule?.type]);
-
-  useEffect(() => {
-    const currentTimezone = watch(`schedules.${index}.timeZone`);
-    if (currentTimezone) {
-      setTimezone(currentTimezone);
-    }
-  }, [watch, index]);
 
   const handleRuleTypeChange = (newType: string) => {
     const type = newType as RuleType;
@@ -132,16 +122,6 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
           }
         />
       )}
-
-      <Select
-        label={t('reminder.timezone')}
-        options={commonTimezones}
-        value={timezone}
-        onChange={(e) => {
-          setTimezone(e.target.value);
-          setValue(`schedules.${index}.timeZone`, e.target.value);
-        }}
-      />
     </div>
   );
 };

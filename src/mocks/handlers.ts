@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { CreateReminderDto, UserReminderResponse, ReminderStatus, UpdateReminderDto, ChangeReminderStatusDto, GetPagedUserRemindersQueryResponse } from '@/api/types';
+import { CreateReminderDto, UserReminderResponse, ReminderState, UpdateReminderDto, GetPagedUserRemindersQueryResponse, ReminderCreatedResponseDto, UpdateUserReminderCommandResponse, PauseUserReminderCommandResponse, ActivatePausedReminderCommandResponse, ConvertEndedReminderToDraftCommandResponse } from '@/api/types';
 import { remindersStore, addReminder, updateReminder, deleteReminder, getReminder } from './data';
 
 const API_BASE = '/v1';
@@ -40,22 +40,31 @@ export const handlers = [
   http.post(`${API_BASE}/reminders`, async ({ request }) => {
     const body = await request.json() as CreateReminderDto;
 
+    const reminderId = crypto.randomUUID();
     const newReminder: UserReminderResponse = {
-      id: crypto.randomUUID(),
+      id: reminderId,
       text: body.text || null,
-      status: ReminderStatus.Active,
+      timeZone: body.timeZone || null,
+      status: ReminderState.Active,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      pausedAt: null,
+      endedAt: null,
+      nextRunAt: null,
       schedules: body.schedules?.map(schedule => ({
         id: crypto.randomUUID(),
         rule: schedule.rule,
-        timeZone: schedule.timeZone,
+        lastRunAt: null,
       })) || null,
     };
 
     addReminder(newReminder);
 
-    return new HttpResponse(null, { status: 200 });
+    const response: ReminderCreatedResponseDto = {
+      reminderId: reminderId,
+    };
+
+    return HttpResponse.json(response, { status: 201 });
   }),
 
   // PATCH /v1/reminders/:id - Update reminder
@@ -69,9 +78,11 @@ export const handlers = [
     }
 
     const updates: Partial<UserReminderResponse> = {};
+    let hasChanges = false;
 
-    if (body.text !== undefined) {
+    if (body.text !== undefined && body.text !== reminder.text) {
       updates.text = body.text;
+      hasChanges = true;
     }
 
     if (body.scheduleOperations) {
@@ -79,20 +90,22 @@ export const handlers = [
       let newSchedules = [...currentSchedules];
 
       // Handle deletions
-      if (body.scheduleOperations?.delete) {
+      if (body.scheduleOperations?.delete && body.scheduleOperations.delete.length > 0) {
         newSchedules = newSchedules.filter(
           s => !body.scheduleOperations?.delete?.includes(s.id)
         );
+        hasChanges = true;
       }
 
       // Handle additions
-      if (body.scheduleOperations?.add) {
+      if (body.scheduleOperations?.add && body.scheduleOperations.add.length > 0) {
         const addedSchedules = body.scheduleOperations.add.map(schedule => ({
           id: crypto.randomUUID(),
           rule: schedule.rule,
-          timeZone: schedule.timeZone,
+          lastRunAt: null,
         }));
         newSchedules = [...newSchedules, ...addedSchedules];
+        hasChanges = true;
       }
 
       updates.schedules = newSchedules;
@@ -100,7 +113,14 @@ export const handlers = [
 
     updateReminder(id as string, updates);
 
-    return new HttpResponse(null, { status: 200 });
+    const updatedReminder = getReminder(id as string)!;
+    const response: UpdateUserReminderCommandResponse = {
+      message: hasChanges ? 'Reminder updated successfully' : 'No changes made',
+      hasChanges: hasChanges,
+      updatedReminder: updatedReminder,
+    };
+
+    return HttpResponse.json(response, { status: 200 });
   }),
 
   // DELETE /v1/reminders/:id - Delete reminder
@@ -114,21 +134,78 @@ export const handlers = [
 
     deleteReminder(id as string);
 
-    return new HttpResponse(null, { status: 200 });
+    return new HttpResponse(null, { status: 204 });
   }),
 
-  // PATCH /v1/reminders/:id/status - Change reminder status
-  http.patch(`${API_BASE}/reminders/:id/status`, async ({ params, request }) => {
+  // PATCH /v1/reminders/:id/pause - Pause reminder
+  http.patch(`${API_BASE}/reminders/:id/pause`, ({ params }) => {
     const { id } = params;
-    const body = await request.json() as ChangeReminderStatusDto;
     const reminder = getReminder(id as string);
 
     if (!reminder) {
       return new HttpResponse(null, { status: 404 });
     }
 
-    updateReminder(id as string, { status: body.status });
+    updateReminder(id as string, {
+      status: ReminderState.Paused,
+      pausedAt: new Date().toISOString(),
+      nextRunAt: null,
+    });
 
-    return new HttpResponse(null, { status: 200 });
+    const updatedReminder = getReminder(id as string)!;
+    const response: PauseUserReminderCommandResponse = {
+      message: 'Reminder paused successfully',
+      updatedReminder: updatedReminder,
+    };
+
+    return HttpResponse.json(response, { status: 200 });
+  }),
+
+  // PATCH /v1/reminders/:id/activate - Activate paused reminder
+  http.patch(`${API_BASE}/reminders/:id/activate`, ({ params }) => {
+    const { id } = params;
+    const reminder = getReminder(id as string);
+
+    if (!reminder) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    updateReminder(id as string, {
+      status: ReminderState.Active,
+      pausedAt: null,
+      nextRunAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
+    });
+
+    const updatedReminder = getReminder(id as string)!;
+    const response: ActivatePausedReminderCommandResponse = {
+      message: 'Reminder activated successfully',
+      reminder: updatedReminder,
+    };
+
+    return HttpResponse.json(response, { status: 200 });
+  }),
+
+  // PATCH /v1/reminders/:id/convert-to-draft - Convert ended reminder to draft
+  http.patch(`${API_BASE}/reminders/:id/convert-to-draft`, ({ params }) => {
+    const { id } = params;
+    const reminder = getReminder(id as string);
+
+    if (!reminder) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    updateReminder(id as string, {
+      status: ReminderState.Draft,
+      endedAt: null,
+      nextRunAt: null,
+    });
+
+    const updatedReminder = getReminder(id as string)!;
+    const response: ConvertEndedReminderToDraftCommandResponse = {
+      message: 'Reminder converted to draft successfully',
+      updatedReminder: updatedReminder,
+    };
+
+    return HttpResponse.json(response, { status: 200 });
   }),
 ];

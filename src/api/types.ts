@@ -1,8 +1,10 @@
 // Generated from OpenAPI schema
 
-export enum ReminderStatus {
+export enum ReminderState {
+  Draft = 'DRAFT',
   Active = 'ACTIVE',
-  Deactivated = 'DEACTIVATED',
+  Paused = 'PAUSED',
+  Ended = 'ENDED',
 }
 
 export enum ReminderSortBy {
@@ -95,13 +97,12 @@ export interface Rule {
 
 export interface ScheduleRequestDto {
   rule: Rule;
-  timeZone?: string | null;
 }
 
 export interface ReminderScheduleResponse {
   id: string; // UUID
   rule: Rule;
-  timeZone?: string | null;
+  lastRunAt?: string | null; // ISO datetime string
 }
 
 // Alias for backward compatibility
@@ -109,6 +110,7 @@ export type ScheduleResponseDto = ReminderScheduleResponse;
 
 export interface CreateReminderDto {
   text?: string | null;
+  timeZone?: string | null;
   schedules?: ScheduleRequestDto[] | null;
 }
 
@@ -122,16 +124,16 @@ export interface UpdateReminderDto {
   scheduleOperations?: UpdateReminderScheduleOperationsDto;
 }
 
-export interface ChangeReminderStatusDto {
-  status: ReminderStatus;
-}
-
 export interface UserReminderResponse {
   id: string; // UUID
   text?: string | null;
-  status: ReminderStatus;
+  timeZone?: string | null;
+  status: ReminderState;
   createdAt: string; // ISO datetime string
   updatedAt: string; // ISO datetime string
+  pausedAt?: string | null; // ISO datetime string
+  endedAt?: string | null; // ISO datetime string
+  nextRunAt?: string | null; // ISO datetime string
   schedules?: ReminderScheduleResponse[] | null;
 }
 
@@ -141,4 +143,29 @@ export type GetReminderDto = UserReminderResponse;
 export interface GetPagedUserRemindersQueryResponse {
   reminders?: UserReminderResponse[] | null;
   hasNext: boolean;
+}
+
+export interface ReminderCreatedResponseDto {
+  reminderId: string; // UUID
+}
+
+export interface UpdateUserReminderCommandResponse {
+  message?: string | null;
+  hasChanges: boolean;
+  updatedReminder: UserReminderResponse;
+}
+
+export interface PauseUserReminderCommandResponse {
+  message?: string | null;
+  updatedReminder: UserReminderResponse;
+}
+
+export interface ActivatePausedReminderCommandResponse {
+  message?: string | null;
+  reminder: UserReminderResponse;
+}
+
+export interface ConvertEndedReminderToDraftCommandResponse {
+  message?: string | null;
+  updatedReminder: UserReminderResponse;
 }

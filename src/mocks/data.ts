@@ -1,35 +1,42 @@
-import { UserReminderResponse, ReminderStatus, RuleType, RuleDateMode, RuleTimeMode, TimeUnit } from '@/api/types';
+import { UserReminderResponse, ReminderState, RuleType, RuleDateMode, RuleTimeMode, TimeUnit } from '@/api/types';
 
 export const mockReminders: UserReminderResponse[] = [
   {
     id: '550e8400-e29b-41d4-a716-446655440001',
     text: 'Team meeting',
-    status: ReminderStatus.Active,
+    timeZone: 'UTC',
+    status: ReminderState.Active,
     createdAt: '2025-01-01T10:00:00Z',
     updatedAt: '2025-01-01T10:00:00Z',
+    pausedAt: null,
+    endedAt: null,
+    nextRunAt: '2025-10-05T14:30:00Z',
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440011',
-        timeZone: 'UTC',
         rule: {
           type: RuleType.OneTime,
           oneTime: {
             fireAt: '2025-10-05T14:30:00Z',
           },
         },
+        lastRunAt: null,
       },
     ],
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440002',
     text: 'Take medication',
-    status: ReminderStatus.Active,
+    timeZone: 'UTC',
+    status: ReminderState.Active,
     createdAt: '2025-01-02T08:00:00Z',
     updatedAt: '2025-01-02T08:00:00Z',
+    pausedAt: null,
+    endedAt: null,
+    nextRunAt: '2025-10-19T16:00:00Z',
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440012',
-        timeZone: 'UTC',
         rule: {
           type: RuleType.Interval,
           interval: {
@@ -37,19 +44,23 @@ export const mockReminders: UserReminderResponse[] = [
             unit: TimeUnit.Hours,
           },
         },
+        lastRunAt: '2025-10-19T08:00:00Z',
       },
     ],
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440003',
     text: 'Morning standup',
-    status: ReminderStatus.Active,
+    timeZone: 'UTC',
+    status: ReminderState.Active,
     createdAt: '2025-01-03T07:00:00Z',
     updatedAt: '2025-01-03T07:00:00Z',
+    pausedAt: null,
+    endedAt: null,
+    nextRunAt: '2025-10-20T09:00:00Z',
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440013',
-        timeZone: 'UTC',
         rule: {
           type: RuleType.Complex,
           complex: {
@@ -62,19 +73,23 @@ export const mockReminders: UserReminderResponse[] = [
             },
           },
         },
+        lastRunAt: '2025-10-19T09:00:00Z',
       },
     ],
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440004',
     text: 'Weekly review',
-    status: ReminderStatus.Active,
+    timeZone: 'UTC',
+    status: ReminderState.Paused,
     createdAt: '2025-01-04T06:00:00Z',
     updatedAt: '2025-01-04T06:00:00Z',
+    pausedAt: '2025-10-18T12:00:00Z',
+    endedAt: null,
+    nextRunAt: null,
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440014',
-        timeZone: 'UTC',
         rule: {
           type: RuleType.Complex,
           complex: {
@@ -88,19 +103,23 @@ export const mockReminders: UserReminderResponse[] = [
             },
           },
         },
+        lastRunAt: '2025-10-18T17:00:00Z',
       },
     ],
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440005',
     text: 'Monthly report',
-    status: ReminderStatus.Deactivated,
+    timeZone: 'UTC',
+    status: ReminderState.Ended,
     createdAt: '2025-01-05T05:00:00Z',
     updatedAt: '2025-01-05T05:00:00Z',
+    pausedAt: null,
+    endedAt: '2025-10-01T10:00:00Z',
+    nextRunAt: null,
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440015',
-        timeZone: 'UTC',
         rule: {
           type: RuleType.Complex,
           complex: {
@@ -114,19 +133,23 @@ export const mockReminders: UserReminderResponse[] = [
             },
           },
         },
+        lastRunAt: '2025-10-01T10:00:00Z',
       },
     ],
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440006',
     text: 'Drink water',
-    status: ReminderStatus.Active,
+    timeZone: 'UTC',
+    status: ReminderState.Draft,
     createdAt: '2025-01-06T04:00:00Z',
     updatedAt: '2025-01-06T04:00:00Z',
+    pausedAt: null,
+    endedAt: null,
+    nextRunAt: null,
     schedules: [
       {
         id: '550e8400-e29b-41d4-a716-446655440016',
-        timeZone: 'UTC',
         rule: {
           type: RuleType.Complex,
           complex: {
@@ -146,6 +169,7 @@ export const mockReminders: UserReminderResponse[] = [
             },
           },
         },
+        lastRunAt: null,
       },
     ],
   },

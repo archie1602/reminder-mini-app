@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { remindersApi, GetRemindersParams } from '@/api/reminders';
-import { CreateReminderDto, UpdateReminderDto, ChangeReminderStatusDto } from '@/api/types';
+import { CreateReminderDto, UpdateReminderDto } from '@/api/types';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
@@ -85,16 +85,47 @@ export const useDeleteReminder = () => {
   });
 };
 
-export const useChangeReminderStatus = () => {
+export const usePauseReminder = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: ChangeReminderStatusDto }) =>
-      remindersApi.changeStatus(id, data),
+    mutationFn: (id: string) => remindersApi.pause(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
-      toast.success(t('toast.statusChangeSuccess'));
+      toast.success(t('toast.pauseSuccess'));
+    },
+    onError: () => {
+      toast.error(t('toast.error'));
+    },
+  });
+};
+
+export const useActivateReminder = () => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: (id: string) => remindersApi.activate(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
+      toast.success(t('toast.activateSuccess'));
+    },
+    onError: () => {
+      toast.error(t('toast.error'));
+    },
+  });
+};
+
+export const useConvertToDraft = () => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: (id: string) => remindersApi.convertToDraft(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
+      toast.success(t('toast.convertToDraftSuccess'));
     },
     onError: () => {
       toast.error(t('toast.error'));

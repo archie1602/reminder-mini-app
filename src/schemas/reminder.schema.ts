@@ -128,12 +128,12 @@ export const ruleSchema = z.object({
 // Schedule schemas
 export const scheduleRequestSchema = z.object({
   rule: ruleSchema,
-  timeZone: z.string().optional().nullable(),
 });
 
 // Reminder schemas
 export const createReminderSchema = z.object({
   text: z.string().min(1, 'validation.textRequired').max(500, 'validation.textTooLong'),
+  timeZone: z.string().optional().nullable(),
   schedules: z.array(scheduleRequestSchema).min(1, 'validation.scheduleRequired'),
 });
 

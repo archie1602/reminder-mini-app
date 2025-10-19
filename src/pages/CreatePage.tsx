@@ -9,10 +9,11 @@ import { useTelegramMainButton } from '@/hooks/useTelegramMainButton';
 import { useTelegramBackButton } from '@/hooks/useTelegramBackButton';
 import { Textarea } from '@/components/shared/Textarea';
 import { Button } from '@/components/shared/Button';
+import { Select } from '@/components/shared/Select';
 import { ScheduleEditor } from '@/components/reminder/ScheduleEditor';
 import { FormValidationSummary } from '@/components/shared/FormValidationSummary';
 import { RuleType } from '@/api/types';
-import { getDefaultTimezone } from '@/utils/timezones';
+import { getDefaultTimezone, commonTimezones } from '@/utils/timezones';
 import { hasValidationErrors } from '@/utils/formHelpers';
 import dayjs from 'dayjs';
 
@@ -32,9 +33,9 @@ export const CreatePage: FC = () => {
     mode: 'onChange',
     defaultValues: {
       text: '',
+      timeZone: getDefaultTimezone(),
       schedules: [
         {
-          timeZone: getDefaultTimezone(),
           rule: {
             type: RuleType.OneTime,
             oneTime: {
@@ -68,7 +69,6 @@ export const CreatePage: FC = () => {
 
   const handleAddSchedule = () => {
     append({
-      timeZone: getDefaultTimezone(),
       rule: {
         type: RuleType.OneTime,
         oneTime: {
@@ -96,6 +96,19 @@ export const CreatePage: FC = () => {
                 placeholder={t('reminder.textPlaceholder')}
                 error={errors.text?.message ? t(errors.text.message) : undefined}
                 rows={3}
+              />
+            )}
+          />
+
+          <Controller
+            name="timeZone"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                value={field.value || ''}
+                label={t('reminder.timezone')}
+                options={commonTimezones}
               />
             )}
           />

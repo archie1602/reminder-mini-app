@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { UserReminderResponse, ReminderStatus } from '@/api/types';
+import { UserReminderResponse, ReminderState } from '@/api/types';
 import { Card } from '@/components/shared/Card';
 import { Button } from '@/components/shared/Button';
 import { humanizeRule } from '@/utils/humanizeRule';
@@ -37,12 +37,22 @@ export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
           </h3>
           <span
             className={`px-2 py-1 rounded text-xs font-medium ${
-              reminder.status === ReminderStatus.Active
+              reminder.status === ReminderState.Active
                 ? 'bg-green-500/20 text-green-600'
+                : reminder.status === ReminderState.Paused
+                ? 'bg-yellow-500/20 text-yellow-600'
+                : reminder.status === ReminderState.Ended
+                ? 'bg-red-500/20 text-red-600'
                 : 'bg-gray-500/20 text-gray-600'
             }`}
           >
-            {reminder.status === ReminderStatus.Active ? t('common.active') : t('common.inactive')}
+            {reminder.status === ReminderState.Active
+              ? t('common.active')
+              : reminder.status === ReminderState.Paused
+              ? t('common.paused')
+              : reminder.status === ReminderState.Ended
+              ? t('common.ended')
+              : t('common.draft')}
           </span>
         </div>
 
