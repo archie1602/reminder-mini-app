@@ -118,6 +118,7 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
                   date: { ...value.date, range: { from: value.date.range?.from || to, to } },
                 })
               }
+              min={value.date.range?.from}
             />
           </>
         )}

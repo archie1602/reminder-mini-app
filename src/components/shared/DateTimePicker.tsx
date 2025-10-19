@@ -1,14 +1,19 @@
 import { FC } from 'react';
 import { Input } from './Input';
+import dayjs from 'dayjs';
 
 interface DateTimePickerProps {
   label?: string;
   error?: string;
   value: string;
   onChange: (value: string) => void;
+  min?: string;
 }
 
-export const DateTimePicker: FC<DateTimePickerProps> = ({ label, error, value, onChange }) => {
+export const DateTimePicker: FC<DateTimePickerProps> = ({ label, error, value, onChange, min }) => {
+  // Default min to current datetime if not provided
+  const minValue = min || dayjs().format('YYYY-MM-DDTHH:mm');
+
   return (
     <Input
       type="datetime-local"
@@ -16,6 +21,7 @@ export const DateTimePicker: FC<DateTimePickerProps> = ({ label, error, value, o
       error={error}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      min={minValue}
     />
   );
 };
@@ -25,9 +31,13 @@ interface DatePickerProps {
   error?: string;
   value: string;
   onChange: (value: string) => void;
+  min?: string;
 }
 
-export const DatePicker: FC<DatePickerProps> = ({ label, error, value, onChange }) => {
+export const DatePicker: FC<DatePickerProps> = ({ label, error, value, onChange, min }) => {
+  // Default min to today if not provided
+  const minValue = min || dayjs().format('YYYY-MM-DD');
+
   return (
     <Input
       type="date"
@@ -35,6 +45,7 @@ export const DatePicker: FC<DatePickerProps> = ({ label, error, value, onChange 
       error={error}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      min={minValue}
     />
   );
 };
@@ -44,9 +55,10 @@ interface TimePickerProps {
   error?: string;
   value: string;
   onChange: (value: string) => void;
+  min?: string;
 }
 
-export const TimePicker: FC<TimePickerProps> = ({ label, error, value, onChange }) => {
+export const TimePicker: FC<TimePickerProps> = ({ label, error, value, onChange, min }) => {
   return (
     <Input
       type="time"
@@ -54,6 +66,7 @@ export const TimePicker: FC<TimePickerProps> = ({ label, error, value, onChange 
       error={error}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      min={min}
     />
   );
 };

@@ -7,7 +7,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options, className = '', ...props }, ref) => {
+  ({ label, error, options, className = '', disabled, ...props }, ref) => {
     return (
       <div className="w-full">
         {label && (
@@ -17,9 +17,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         )}
         <select
           ref={ref}
+          disabled={disabled}
           className={`w-full px-3 py-2 rounded-lg border bg-[var(--tg-theme-bg-color)] text-[var(--tg-theme-text-color)] border-[var(--tg-theme-hint-color)] focus:outline-none focus:border-[var(--tg-theme-button-color)] ${
             error ? 'border-red-500' : ''
-          } ${className}`}
+          } ${disabled ? 'opacity-60 cursor-not-allowed' : ''} ${className}`}
           {...props}
         >
           {options.map((option) => (

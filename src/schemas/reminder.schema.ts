@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { RuleType, TimeUnit, RuleDateMode, RuleTimeMode } from '@/api/types';
+import dayjs from 'dayjs';
 
 // Base schemas
 const timeUnitSchema = z.nativeEnum(TimeUnit);
@@ -26,6 +27,12 @@ const timeOnlyWithStepRangeSchema = z.object({
 // Rule type schemas
 const ruleOneTimeSchema = z.object({
   fireAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, 'validation.invalidDatetime'),
+}).refine((data) => {
+  // Validate that fireAt is in the future
+  return dayjs(data.fireAt).isAfter(dayjs());
+}, {
+  message: 'validation.futureDateTime',
+  path: ['fireAt'],
 });
 
 const ruleIntervalSchema = z.object({

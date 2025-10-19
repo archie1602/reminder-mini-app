@@ -26,6 +26,7 @@ export const EditPage: FC = () => {
   const { data: reminder, isLoading } = useReminder(id!);
   const updateMutation = useUpdateReminder();
   const [originalFormData, setOriginalFormData] = useState<CreateReminderFormData | null>(null);
+  const [originalScheduleIds, setOriginalScheduleIds] = useState<string[]>([]);
 
   const {
     control,
@@ -73,6 +74,8 @@ export const EditPage: FC = () => {
 
       reset(formData);
       setOriginalFormData(formData);
+      // Store the original schedule IDs in the same order as the form data
+      setOriginalScheduleIds(schedules.map((s) => s.id));
 
       // Show info if expired schedules were removed
       if (reminder.status === ReminderState.Ended && schedules.length < reminder.schedules.length) {
@@ -83,18 +86,50 @@ export const EditPage: FC = () => {
   }, [reminder, reset]);
 
   const onSubmit = async (data: CreateReminderFormData) => {
-    if (!id) return;
+    if (!id || !originalFormData) return;
 
-    // Delete all old schedules and add new ones
-    const oldScheduleIds = reminder?.schedules?.map((s) => s.id) || [];
+    // Determine which schedules were added, removed, or modified
+    const schedulesToDelete: string[] = [];
+    const schedulesToAdd: typeof data.schedules = [];
+
+    // Compare current schedules with original schedules
+    const currentSchedules = data.schedules || [];
+    const originalSchedules = originalFormData.schedules || [];
+
+    // Check for removed or modified schedules
+    originalSchedules.forEach((originalSchedule, index) => {
+      const currentSchedule = currentSchedules[index];
+      const scheduleId = originalScheduleIds[index];
+
+      if (!currentSchedule) {
+        // Schedule was removed
+        if (scheduleId) {
+          schedulesToDelete.push(scheduleId);
+        }
+      } else {
+        // Check if schedule was modified
+        const isModified = JSON.stringify(originalSchedule.rule) !== JSON.stringify(currentSchedule.rule);
+        if (isModified && scheduleId) {
+          // Schedule was modified: delete old and add new
+          schedulesToDelete.push(scheduleId);
+          schedulesToAdd.push(currentSchedule);
+        }
+      }
+    });
+
+    // Check for newly added schedules (schedules beyond the original count)
+    if (currentSchedules.length > originalSchedules.length) {
+      const newSchedules = currentSchedules.slice(originalSchedules.length);
+      schedulesToAdd.push(...newSchedules);
+    }
 
     await updateMutation.mutateAsync({
       id,
       data: {
         text: data.text,
         scheduleOperations: {
-          delete: oldScheduleIds.length > 0 ? oldScheduleIds : undefined,
-          add: data.schedules,
+          delete: schedulesToDelete.length > 0 ? schedulesToDelete : undefined,
+          add: schedulesToAdd.length > 0 ? schedulesToAdd : undefined,
         },
       },
     });
@@ -111,11 +146,22 @@ export const EditPage: FC = () => {
     // Check text change
     if (originalFormData.text !== watchedValues.text) return true;
 
-    // Check schedules change (simplified check based on count for now)
+    // Check schedules change - deep comparison
     if (originalFormData.schedules.length !== watchedValues.schedules?.length) return true;
 
-    // For a more thorough check, you'd compare each schedule's rule deeply
-    // This is simplified for now
+    // Deep compare each schedule's rule
+    for (let i = 0; i < originalFormData.schedules.length; i++) {
+      const originalSchedule = originalFormData.schedules[i];
+      const currentSchedule = watchedValues.schedules?.[i];
+
+      if (!currentSchedule) return true;
+
+      // Compare using JSON.stringify for deep equality
+      if (JSON.stringify(originalSchedule.rule) !== JSON.stringify(currentSchedule.rule)) {
+        return true;
+      }
+    }
+
     return false;
   }, [originalFormData, watchedValues]);
 
@@ -190,6 +236,7 @@ export const EditPage: FC = () => {
                   value={field.value || ''}
                   label={t('reminder.timezone')}
                   options={commonTimezones}
+                  disabled={true}
                 />
               )}
             />
@@ -235,6 +282,7 @@ export const EditPage: FC = () => {
               }}
               disabled={hasErrors || updateMutation.isPending || !hasChanges}
               fullWidth
+              title={!hasChanges ? t('reminder.noChangesDetected') : undefined}
             >
               {t('common.save')}
             </Button>

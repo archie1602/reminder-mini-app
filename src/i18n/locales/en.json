@@ -129,7 +129,8 @@
     "invalidTimeFormat": "Invalid time format (use HH:MM:SS)",
     "invalidRuleType": "Schedule configuration is incomplete",
     "invalidTimeRange": "Please set a valid time range",
-    "noChangesDetected": "No changes detected. Please make changes before saving."
+    "noChangesDetected": "No changes detected. Please make changes before saving.",
+    "futureDateTime": "Date and time should be in the future"
   },
   "toast": {
     "createSuccess": "Reminder created successfully",
