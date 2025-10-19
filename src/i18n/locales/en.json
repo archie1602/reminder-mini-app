@@ -11,10 +11,15 @@
     "confirm": "Confirm",
     "active": "Active",
     "inactive": "Inactive",
+    "paused": "Paused",
+    "ended": "Ended",
+    "draft": "Draft",
     "retry": "Retry",
     "remove": "Remove",
     "addSchedule": "Add Schedule",
-    "loadMore": "Load More"
+    "loadMore": "Load More",
+    "pause": "Pause",
+    "activate": "Activate"
   },
   "reminder": {
     "title": "Reminders",
@@ -29,7 +34,12 @@
     "createFirst": "Create your first reminder",
     "deleteConfirm": "Are you sure you want to delete this reminder?",
     "schedules": "Schedules",
-    "removeScheduleConfirm": "Are you sure you want to remove this schedule?"
+    "removeScheduleConfirm": "Are you sure you want to remove this schedule?",
+    "noSchedules": "No schedules added. The reminder will be saved as a draft.",
+    "saveAsDraft": "Save as Draft",
+    "noChangesDetected": "No changes detected",
+    "pausedCannotEdit": "Paused reminders cannot be edited. Please activate it first.",
+    "endedEditInfo": "This reminder has ended. Expired schedules have been removed. Adding new schedules will reactivate it."
   },
   "rule": {
     "type": "Schedule type",
@@ -118,7 +128,8 @@
     "invalidDateFormat": "Invalid date format (use YYYY-MM-DD)",
     "invalidTimeFormat": "Invalid time format (use HH:MM:SS)",
     "invalidRuleType": "Schedule configuration is incomplete",
-    "invalidTimeRange": "Please set a valid time range"
+    "invalidTimeRange": "Please set a valid time range",
+    "noChangesDetected": "No changes detected. Please make changes before saving."
   },
   "toast": {
     "createSuccess": "Reminder created successfully",

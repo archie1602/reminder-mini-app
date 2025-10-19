@@ -34,16 +34,7 @@ export const CreatePage: FC = () => {
     defaultValues: {
       text: '',
       timeZone: getDefaultTimezone(),
-      schedules: [
-        {
-          rule: {
-            type: RuleType.OneTime,
-            oneTime: {
-              fireAt: dayjs().add(1, 'hour').format('YYYY-MM-DDTHH:mm:ss'),
-            },
-          },
-        },
-      ],
+      schedules: [], // Start with no schedules to allow DRAFT creation
     },
   });
 
@@ -59,9 +50,12 @@ export const CreatePage: FC = () => {
 
   const hasErrors = hasValidationErrors(errors);
 
+  const watchedSchedules = watch('schedules') || [];
+  const isDraft = watchedSchedules.length === 0;
+
   useTelegramBackButton();
   useTelegramMainButton({
-    text: t('common.save'),
+    text: isDraft ? t('reminder.saveAsDraft', 'Save as Draft') : t('common.save'),
     onClick: handleSubmit(onSubmit),
     enabled: !hasErrors && !createMutation.isPending,
     visible: true,
@@ -131,9 +125,15 @@ export const CreatePage: FC = () => {
                 setValue={setValue}
                 watch={watch}
                 onRemove={() => remove(index)}
-                showRemoveButton={fields.length > 1}
+                showRemoveButton={true} // Always show remove button to allow creating DRAFT
               />
             ))}
+
+            {fields.length === 0 && (
+              <div className="text-sm text-[var(--tg-theme-hint-color)] text-center py-4 bg-[var(--tg-theme-secondary-bg-color)] rounded-lg">
+                {t('reminder.noSchedules', 'No schedules added. The reminder will be saved as a draft.')}
+              </div>
+            )}
           </div>
 
           <FormValidationSummary errors={errors} isVisible={hasErrors} />
@@ -143,7 +143,7 @@ export const CreatePage: FC = () => {
             disabled={hasErrors || createMutation.isPending}
             fullWidth
           >
-            {t('common.save')}
+            {isDraft ? t('reminder.saveAsDraft', 'Save as Draft') : t('common.save')}
           </Button>
         </form>
       </div>

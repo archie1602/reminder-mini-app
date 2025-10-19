@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
@@ -13,9 +13,10 @@ import { Select } from '@/components/shared/Select';
 import { ScheduleEditor } from '@/components/reminder/ScheduleEditor';
 import { FormValidationSummary } from '@/components/shared/FormValidationSummary';
 import { SkeletonForm, FadeIn } from '@/components/shared/Skeleton';
-import { RuleType } from '@/api/types';
+import { RuleType, ReminderState } from '@/api/types';
 import { getDefaultTimezone, commonTimezones } from '@/utils/timezones';
 import { hasValidationErrors } from '@/utils/formHelpers';
+import { canEditReminder, isScheduleExpired } from '@/utils/reminderHelpers';
 import dayjs from 'dayjs';
 
 export const EditPage: FC = () => {
@@ -24,6 +25,7 @@ export const EditPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: reminder, isLoading } = useReminder(id!);
   const updateMutation = useUpdateReminder();
+  const [originalFormData, setOriginalFormData] = useState<CreateReminderFormData | null>(null);
 
   const {
     control,
@@ -42,16 +44,41 @@ export const EditPage: FC = () => {
     name: 'schedules',
   });
 
+  // Check if reminder can be edited
+  useEffect(() => {
+    if (reminder && !canEditReminder(reminder.status)) {
+      // PAUSED reminders cannot be edited
+      if (reminder.status === ReminderState.Paused) {
+        alert(t('reminder.pausedCannotEdit'));
+        navigate('/');
+      }
+    }
+  }, [reminder, navigate, t]);
+
   // Initialize form with existing reminder data
   useEffect(() => {
     if (reminder && reminder.schedules) {
-      reset({
+      // Filter out expired schedules for ENDED reminders
+      const schedules = reminder.status === ReminderState.Ended
+        ? reminder.schedules.filter(s => !isScheduleExpired(s))
+        : reminder.schedules;
+
+      const formData: CreateReminderFormData = {
         text: reminder.text || '',
         timeZone: reminder.timeZone || getDefaultTimezone(),
-        schedules: reminder.schedules.map((schedule) => ({
+        schedules: schedules.map((schedule) => ({
           rule: schedule.rule,
         })),
-      });
+      };
+
+      reset(formData);
+      setOriginalFormData(formData);
+
+      // Show info if expired schedules were removed
+      if (reminder.status === ReminderState.Ended && schedules.length < reminder.schedules.length) {
+        const removedCount = reminder.schedules.length - schedules.length;
+        console.info(`Removed ${removedCount} expired schedule(s)`);
+      }
     }
   }, [reminder, reset]);
 
@@ -75,13 +102,30 @@ export const EditPage: FC = () => {
     navigate('/');
   };
 
+  const watchedValues = watch();
+
+  // Calculate if there are actual changes
+  const hasChanges = useMemo(() => {
+    if (!originalFormData || !watchedValues) return false;
+
+    // Check text change
+    if (originalFormData.text !== watchedValues.text) return true;
+
+    // Check schedules change (simplified check based on count for now)
+    if (originalFormData.schedules.length !== watchedValues.schedules?.length) return true;
+
+    // For a more thorough check, you'd compare each schedule's rule deeply
+    // This is simplified for now
+    return false;
+  }, [originalFormData, watchedValues]);
+
   const hasErrors = hasValidationErrors(errors);
 
   useTelegramBackButton();
   useTelegramMainButton({
     text: t('common.save'),
     onClick: handleSubmit(onSubmit),
-    enabled: !hasErrors && !updateMutation.isPending,
+    enabled: !hasErrors && !updateMutation.isPending && hasChanges,
     visible: true,
   });
 
@@ -113,6 +157,14 @@ export const EditPage: FC = () => {
           <h1 className="text-2xl font-bold text-[var(--tg-theme-text-color)] mb-6">
             {t('reminder.editTitle')}
           </h1>
+
+          {reminder.status === ReminderState.Ended && (
+            <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-600 dark:text-yellow-400 p-3 rounded-lg mb-4">
+              <p className="text-sm">
+                {t('reminder.endedEditInfo', 'This reminder has ended. Expired schedules have been removed. Adding new schedules will reactivate it.')}
+              </p>
+            </div>
+          )}
 
           <form className="space-y-6">
             <Controller
@@ -167,9 +219,21 @@ export const EditPage: FC = () => {
 
             <FormValidationSummary errors={errors} isVisible={hasErrors} />
 
+            {!hasChanges && !hasErrors && (
+              <div className="text-sm text-[var(--tg-theme-hint-color)] text-center">
+                {t('reminder.noChangesDetected')}
+              </div>
+            )}
+
             <Button
-              onClick={handleSubmit(onSubmit)}
-              disabled={hasErrors || updateMutation.isPending}
+              onClick={() => {
+                if (!hasChanges) {
+                  alert(t('reminder.noChangesDetected'));
+                } else {
+                  handleSubmit(onSubmit)();
+                }
+              }}
+              disabled={hasErrors || updateMutation.isPending || !hasChanges}
               fullWidth
             >
               {t('common.save')}

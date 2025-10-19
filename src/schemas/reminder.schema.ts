@@ -134,7 +134,7 @@ export const scheduleRequestSchema = z.object({
 export const createReminderSchema = z.object({
   text: z.string().min(1, 'validation.textRequired').max(500, 'validation.textTooLong'),
   timeZone: z.string().optional().nullable(),
-  schedules: z.array(scheduleRequestSchema).min(1, 'validation.scheduleRequired'),
+  schedules: z.array(scheduleRequestSchema).min(0), // Allow 0 schedules for DRAFT creation
 });
 
 export const updateReminderSchema = z.object({
@@ -143,6 +143,19 @@ export const updateReminderSchema = z.object({
     add: z.array(scheduleRequestSchema).optional().nullable(),
     delete: z.array(z.string().uuid()).optional().nullable(),
   }).optional(),
+}).superRefine((data, ctx) => {
+  // Ensure at least one change is present
+  const hasTextChange = data.text !== undefined && data.text !== null;
+  const hasScheduleAdd = data.scheduleOperations?.add && data.scheduleOperations.add.length > 0;
+  const hasScheduleDelete = data.scheduleOperations?.delete && data.scheduleOperations.delete.length > 0;
+
+  if (!hasTextChange && !hasScheduleAdd && !hasScheduleDelete) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'validation.noChangesDetected',
+      path: [],
+    });
+  }
 });
 
 // Form-specific schemas for easier form handling

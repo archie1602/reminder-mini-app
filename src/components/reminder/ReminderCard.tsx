@@ -1,11 +1,21 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { UserReminderResponse, ReminderState } from '@/api/types';
 import { Card } from '@/components/shared/Card';
 import { Button } from '@/components/shared/Button';
 import { humanizeRule } from '@/utils/humanizeRule';
-import { useDeleteReminder } from '@/hooks/useReminders';
+import {
+  useDeleteReminder,
+  usePauseReminder,
+  useActivateReminder
+} from '@/hooks/useReminders';
+import {
+  getReminderActions,
+  getStatusMessage,
+  getEditWarningMessage
+} from '@/utils/reminderHelpers';
+import { ConfirmationModal } from '@/components/modals/ConfirmationModal';
 
 interface ReminderCardProps {
   reminder: UserReminderResponse;
@@ -14,10 +24,19 @@ interface ReminderCardProps {
 export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [showEditWarning, setShowEditWarning] = useState(false);
+
   const deleteMutation = useDeleteReminder();
+  const pauseMutation = usePauseReminder();
+  const activateMutation = useActivateReminder();
 
   const handleEdit = () => {
-    navigate(`/edit/${reminder.id}`);
+    // Show warning for ENDED reminders
+    if (reminder.status === ReminderState.Ended) {
+      setShowEditWarning(true);
+    } else {
+      navigate(`/edit/${reminder.id}`);
+    }
   };
 
   const handleDelete = () => {
@@ -26,7 +45,23 @@ export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
     }
   };
 
+  const handlePause = () => {
+    pauseMutation.mutate(reminder.id);
+  };
+
+  const handleActivate = () => {
+    activateMutation.mutate(reminder.id);
+  };
+
+  const handleConfirmEdit = () => {
+    setShowEditWarning(false);
+    navigate(`/edit/${reminder.id}`);
+  };
+
   const schedules = reminder.schedules || [];
+  const actions = getReminderActions(reminder.status);
+  const statusMessage = getStatusMessage(reminder.status);
+  const editWarningMessage = getEditWarningMessage(reminder.status);
 
   return (
     <Card>
@@ -69,15 +104,58 @@ export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
           </div>
         )}
 
+        {statusMessage && (
+          <div className="text-sm text-[var(--tg-theme-hint-color)] bg-[var(--tg-theme-bg-color)] p-2 rounded">
+            {statusMessage}
+          </div>
+        )}
+
         <div className="flex gap-2 mt-4">
-          <Button variant="secondary" onClick={handleEdit} className="flex-1">
-            {t('common.edit')}
-          </Button>
-          <Button variant="danger" onClick={handleDelete} className="flex-1">
-            {t('common.delete')}
-          </Button>
+          {actions.map((action) => {
+            const handleAction = () => {
+              switch (action.type) {
+                case 'edit':
+                  handleEdit();
+                  break;
+                case 'delete':
+                  handleDelete();
+                  break;
+                case 'pause':
+                  handlePause();
+                  break;
+                case 'activate':
+                  handleActivate();
+                  break;
+                default:
+                  break;
+              }
+            };
+
+            return (
+              <Button
+                key={action.type}
+                variant={action.variant || 'secondary'}
+                onClick={handleAction}
+                className="flex-1"
+              >
+                {t(action.label)}
+              </Button>
+            );
+          })}
         </div>
       </div>
+
+      {/* Edit warning modal for ENDED reminders */}
+      <ConfirmationModal
+        isOpen={showEditWarning}
+        title="Edit Ended Reminder"
+        message={editWarningMessage || ''}
+        confirmText="Continue"
+        cancelText="Cancel"
+        onConfirm={handleConfirmEdit}
+        onCancel={() => setShowEditWarning(false)}
+        variant="warning"
+      />
     </Card>
   );
 };
