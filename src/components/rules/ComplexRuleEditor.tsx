@@ -28,15 +28,15 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
     { value: RuleTimeMode.Range, label: t('timeMode.RANGE') },
   ];
 
-  const timeUnitOptions = [
+  // Time range step units (backend only allows Minutes and Hours)
+  const timeRangeStepUnitOptions = [
     { value: TimeUnit.Minutes, label: t('timeUnit.MINUTES') },
     { value: TimeUnit.Hours, label: t('timeUnit.HOURS') },
-    { value: TimeUnit.Days, label: t('timeUnit.DAYS') },
   ];
 
   const weekDayOptions = Array.from({ length: 7 }, (_, i) => ({
-    value: i + 1,
-    label: t(`weekDayShort.${i + 1}`),
+    value: i,
+    label: t(`weekDayShort.${i}`),
   }));
 
   const monthDayOptions = Array.from({ length: 31 }, (_, i) => ({
@@ -252,7 +252,7 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
               />
               <Select
                 label={t('rule.unit')}
-                options={timeUnitOptions}
+                options={timeRangeStepUnitOptions}
                 value={value.time.stepRange?.step.unit || TimeUnit.Hours}
                 onChange={(e) =>
                   onChange({

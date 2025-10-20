@@ -80,22 +80,22 @@
     "DAYS": "Days"
   },
   "weekDay": {
+    "0": "Sunday",
     "1": "Monday",
     "2": "Tuesday",
     "3": "Wednesday",
     "4": "Thursday",
     "5": "Friday",
-    "6": "Saturday",
-    "7": "Sunday"
+    "6": "Saturday"
   },
   "weekDayShort": {
+    "0": "Sun",
     "1": "Mon",
     "2": "Tue",
     "3": "Wed",
     "4": "Thu",
     "5": "Fri",
-    "6": "Sat",
-    "7": "Sun"
+    "6": "Sat"
   },
   "month": {
     "1": "January",
@@ -133,7 +133,15 @@
     "noChangesDetected": "No changes detected. Please make changes before saving.",
     "futureDateTime": "Date and time should be in the future",
     "toDateMustBeAfterFromDate": "'To' date must be greater than or equal to 'From' date",
-    "toTimeMustBeAfterFromTime": "'To' time must be greater than or equal to 'From' time"
+    "toTimeMustBeAfterFromTime": "'To' time must be greater than or equal to 'From' time",
+    "invalidTimezone": "Invalid timezone",
+    "invalidTimeRangeStepUnit": "Only Minutes and Hours are allowed for time range steps",
+    "oneTimeRequired": "One-time configuration is required",
+    "intervalRequired": "Interval configuration is required",
+    "complexRequired": "Complex configuration is required",
+    "oneTimeShouldBeNull": "One-time configuration should not be set for this rule type",
+    "intervalShouldBeNull": "Interval configuration should not be set for this rule type",
+    "complexShouldBeNull": "Complex configuration should not be set for this rule type"
   },
   "toast": {
     "createSuccess": "Reminder created successfully",

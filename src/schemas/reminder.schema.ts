@@ -22,6 +22,12 @@ const dateOnlyRangeSchema = z.object({
 const timeRangeStepSchema = z.object({
   every: z.number().int().positive('validation.mustBePositive'),
   unit: timeUnitSchema,
+}).refine((data) => {
+  // Only Minutes and Hours are allowed for time range steps
+  return data.unit === TimeUnit.Minutes || data.unit === TimeUnit.Hours;
+}, {
+  message: 'validation.invalidTimeRangeStepUnit',
+  path: ['unit'],
 });
 
 const timeOnlyWithStepRangeSchema = z.object({
@@ -58,7 +64,7 @@ const ruleDateSchema = z.object({
   mode: ruleDateModeSchema,
   at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.invalidDateFormat').nullish(),
   range: dateOnlyRangeSchema.nullish(),
-  weekDays: z.array(z.number().int().min(1).max(7)).nullish(),
+  weekDays: z.array(z.number().int().min(0).max(6)).nullish(),
   monthDays: z.array(z.number().int().min(1).max(31)).nullish(),
   months: z.array(z.number().int().min(1).max(12)).nullish(),
 }).superRefine((data, ctx) => {
@@ -136,14 +142,82 @@ export const ruleSchema = z.object({
   oneTime: ruleOneTimeSchema.nullish(),
   interval: ruleIntervalSchema.nullish(),
   complex: ruleComplexSchema.nullish(),
-}).refine((data) => {
+}).superRefine((data, ctx) => {
   // Ensure the correct property is present based on type
-  if (data.type === RuleType.OneTime) return !!data.oneTime;
-  if (data.type === RuleType.Interval) return !!data.interval;
-  if (data.type === RuleType.Complex) return !!data.complex;
-  return false;
-}, {
-  message: 'validation.invalidRuleType',
+  if (data.type === RuleType.OneTime) {
+    if (!data.oneTime) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.oneTimeRequired',
+        path: ['oneTime'],
+      });
+    }
+    // Ensure other properties are null
+    if (data.interval !== null && data.interval !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.intervalShouldBeNull',
+        path: ['interval'],
+      });
+    }
+    if (data.complex !== null && data.complex !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.complexShouldBeNull',
+        path: ['complex'],
+      });
+    }
+  }
+
+  if (data.type === RuleType.Interval) {
+    if (!data.interval) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.intervalRequired',
+        path: ['interval'],
+      });
+    }
+    // Ensure other properties are null
+    if (data.oneTime !== null && data.oneTime !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.oneTimeShouldBeNull',
+        path: ['oneTime'],
+      });
+    }
+    if (data.complex !== null && data.complex !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.complexShouldBeNull',
+        path: ['complex'],
+      });
+    }
+  }
+
+  if (data.type === RuleType.Complex) {
+    if (!data.complex) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.complexRequired',
+        path: ['complex'],
+      });
+    }
+    // Ensure other properties are null
+    if (data.oneTime !== null && data.oneTime !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.oneTimeShouldBeNull',
+        path: ['oneTime'],
+      });
+    }
+    if (data.interval !== null && data.interval !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.intervalShouldBeNull',
+        path: ['interval'],
+      });
+    }
+  }
 });
 
 // Schedule schemas
@@ -156,6 +230,20 @@ export const createReminderSchema = z.object({
   text: z.string().min(1, 'validation.textRequired').max(500, 'validation.textTooLong'),
   timeZone: z.string().optional().nullable(),
   schedules: z.array(scheduleRequestSchema).min(0), // Allow 0 schedules for DRAFT creation
+}).superRefine((data, ctx) => {
+  // Validate timezone if provided
+  if (data.timeZone) {
+    try {
+      // Check if timezone is valid using Intl API
+      Intl.DateTimeFormat(undefined, { timeZone: data.timeZone });
+    } catch (error) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'validation.invalidTimezone',
+        path: ['timeZone'],
+      });
+    }
+  }
 });
 
 export const updateReminderSchema = z.object({
