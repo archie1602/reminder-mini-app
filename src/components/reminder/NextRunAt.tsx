@@ -27,10 +27,13 @@ export const NextRunAt: FC<NextRunAtProps> = ({ nextRunAt }) => {
 
   return (
     <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 flex items-start gap-2">
-      <span className="text-lg">⏰</span>
-      <div className="flex-1">
+      <span className="text-lg flex-shrink-0 min-w-[1.5em]">⏰</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+          {t('reminder.nextFire')}:
+        </p>
         <p className="text-sm text-blue-600 dark:text-blue-400">
-          {t('reminder.nextRunAtCombined', { datetime: absoluteTime, relative: relativeTime })}
+          {absoluteTime} ({relativeTime})
         </p>
       </div>
     </div>
