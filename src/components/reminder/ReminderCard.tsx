@@ -61,8 +61,8 @@ export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
 
   const schedules = reminder.schedules || [];
   const actions = getReminderActions(reminder.status);
-  const statusMessage = getStatusMessage(reminder.status);
-  const editWarningMessage = getEditWarningMessage(reminder.status);
+  const statusMessage = getStatusMessage(reminder.status, t);
+  const editWarningMessage = getEditWarningMessage(reminder.status, t);
 
   return (
     <Card>
@@ -153,10 +153,10 @@ export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
       {/* Edit warning modal for ENDED reminders */}
       <ConfirmationModal
         isOpen={showEditWarning}
-        title="Edit Ended Reminder"
+        title={t('modal.editEndedReminder')}
         message={editWarningMessage || ''}
-        confirmText="Continue"
-        cancelText="Cancel"
+        confirmText={t('common.continue')}
+        cancelText={t('common.cancel')}
         onConfirm={handleConfirmEdit}
         onCancel={() => setShowEditWarning(false)}
         variant="warning"

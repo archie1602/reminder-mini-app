@@ -19,7 +19,8 @@
     "addSchedule": "Add Schedule",
     "loadMore": "Load More",
     "pause": "Pause",
-    "activate": "Activate"
+    "activate": "Activate",
+    "continue": "Continue"
   },
   "reminder": {
     "title": "Reminders",
@@ -40,7 +41,11 @@
     "saveAsDraft": "Save as Draft",
     "noChangesDetected": "No changes detected",
     "pausedCannotEdit": "Paused reminders cannot be edited. Please activate it first.",
-    "endedEditInfo": "This reminder has ended. Expired schedules have been removed. Adding new schedules will reactivate it."
+    "endedEditInfo": "This reminder has ended. Expired schedules have been removed. Adding new schedules will reactivate it.",
+    "statusDraft": "This reminder is a draft. Add schedules to activate it.",
+    "statusPaused": "This reminder is paused and cannot be edited. Activate it first to make changes.",
+    "statusEnded": "This reminder has ended. You can edit it to create new schedules.",
+    "editWarningExpiredSchedules": "This reminder has ended and some schedules have expired. When you save:\n- Expired schedules will be removed\n- If you add new schedules, the reminder will be reactivated\n- If you don't add schedules, it will remain ended"
   },
   "rule": {
     "type": "Schedule type",
@@ -161,5 +166,28 @@
     "exactDate": "{{date}} at {{time}}",
     "dateRange": "From {{from}} to {{to}} at {{time}}",
     "timeRange": "{{date}} from {{from}} to {{to}} every {{step}}"
+  },
+  "modal": {
+    "editEndedReminder": "Edit Ended Reminder",
+    "defaultConfirm": "Confirm",
+    "defaultCancel": "Cancel"
+  },
+  "indexPage": {
+    "title": "Application Launch Data",
+    "description": "These pages help developer to learn more about current launch information",
+    "initDataLink": "Init Data",
+    "initDataDescription": "User data, chat information, technical data",
+    "launchParamsLink": "Launch Parameters",
+    "launchParamsDescription": "Platform identifier, Mini Apps version, etc.",
+    "themeParamsLink": "Theme Parameters",
+    "themeParamsDescription": "Telegram application palette information"
+  },
+  "initDataPage": {
+    "title": "Init Data",
+    "errorTitle": "Oops",
+    "errorMessage": "Application was launched with missing init data",
+    "headerUser": "User",
+    "headerReceiver": "Receiver",
+    "headerChat": "Chat"
   }
 }

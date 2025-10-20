@@ -1,28 +1,31 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Link } from '@/components/Link/Link.tsx';
 import { Page } from '@/components/Page.tsx';
 
 export const IndexPage: FC = () => {
+  const { t } = useTranslation();
+
   return (
     <Page back={false}>
       <div>
-        <h2>Application Launch Data</h2>
-        <p>These pages help developer to learn more about current launch information</p>
+        <h2>{t('indexPage.title')}</h2>
+        <p>{t('indexPage.description')}</p>
         <ul>
           <li>
             <Link to="/init-data">
-              Init Data - User data, chat information, technical data
+              {t('indexPage.initDataLink')} - {t('indexPage.initDataDescription')}
             </Link>
           </li>
           <li>
             <Link to="/launch-params">
-              Launch Parameters - Platform identifier, Mini Apps version, etc.
+              {t('indexPage.launchParamsLink')} - {t('indexPage.launchParamsDescription')}
             </Link>
           </li>
           <li>
             <Link to="/theme-params">
-              Theme Parameters - Telegram application palette information
+              {t('indexPage.themeParamsLink')} - {t('indexPage.themeParamsDescription')}
             </Link>
           </li>
         </ul>

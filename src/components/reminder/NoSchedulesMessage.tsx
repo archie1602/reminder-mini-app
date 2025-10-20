@@ -6,7 +6,7 @@ export const NoSchedulesMessage: FC = () => {
 
   return (
     <div className="text-sm text-[var(--tg-theme-hint-color)] text-center py-4 bg-[var(--tg-theme-secondary-bg-color)] rounded-lg">
-      {t('reminder.noSchedules', 'No schedules added. The reminder will be saved as a draft.')}
+      {t('reminder.noSchedules')}
     </div>
   );
 };

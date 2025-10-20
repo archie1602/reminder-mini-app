@@ -1,4 +1,5 @@
 import { type FC, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   initDataRaw as _initDataRaw,
   initDataState as _initDataState,
@@ -14,6 +15,7 @@ function getUserRows(user: User): DisplayDataRow[] {
 }
 
 export const InitDataPage: FC = () => {
+  const { t } = useTranslation();
   const initDataRaw = useSignal(_initDataRaw);
   const initDataState = useSignal(_initDataState);
 
@@ -56,8 +58,8 @@ export const InitDataPage: FC = () => {
     return (
       <Page>
         <div>
-          <h2>Oops</h2>
-          <p>Application was launched with missing init data</p>
+          <h2>{t('initDataPage.errorTitle')}</h2>
+          <p>{t('initDataPage.errorMessage')}</p>
           <img
             alt="Telegram sticker"
             src="https://xelene.me/telegram.gif"
@@ -70,10 +72,10 @@ export const InitDataPage: FC = () => {
   return (
     <Page>
       <div>
-        <DisplayData header={'Init Data'} rows={initDataRows}/>
-        {userRows && <DisplayData header={'User'} rows={userRows}/>}
-        {receiverRows && <DisplayData header={'Receiver'} rows={receiverRows}/>}
-        {chatRows && <DisplayData header={'Chat'} rows={chatRows}/>}
+        <DisplayData header={t('initDataPage.title')} rows={initDataRows}/>
+        {userRows && <DisplayData header={t('initDataPage.headerUser')} rows={userRows}/>}
+        {receiverRows && <DisplayData header={t('initDataPage.headerReceiver')} rows={receiverRows}/>}
+        {chatRows && <DisplayData header={t('initDataPage.headerChat')} rows={chatRows}/>}
       </div>
     </Page>
   );

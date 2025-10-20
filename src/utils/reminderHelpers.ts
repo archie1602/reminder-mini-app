@@ -1,4 +1,5 @@
 import { ReminderState, ScheduleResponseDto, RuleType } from '@/api/types';
+import { TFunction } from 'i18next';
 
 /**
  * Check if a reminder can be edited based on its status
@@ -60,14 +61,14 @@ export const filterExpiredSchedules = (schedules: ScheduleResponseDto[]): Schedu
 /**
  * Get status-specific message for reminders
  */
-export const getStatusMessage = (status: ReminderState): string | null => {
+export const getStatusMessage = (status: ReminderState, t: TFunction): string | null => {
   switch (status) {
     case ReminderState.Draft:
-      return 'This reminder is a draft. Add schedules to activate it.';
+      return t('reminder.statusDraft');
     case ReminderState.Paused:
-      return 'This reminder is paused and cannot be edited. Activate it first to make changes.';
+      return t('reminder.statusPaused');
     case ReminderState.Ended:
-      return 'This reminder has ended. You can edit it to create new schedules.';
+      return t('reminder.statusEnded');
     default:
       return null;
   }
@@ -133,11 +134,9 @@ export const hasFormChanges = (
 /**
  * Get a human-readable description of what will happen when editing a reminder
  */
-export const getEditWarningMessage = (status: ReminderState): string | null => {
+export const getEditWarningMessage = (status: ReminderState, t: TFunction): string | null => {
   if (status === ReminderState.Ended) {
-    return `Editing will delete all expired schedules.
-If you don't add new schedules, this reminder will become a Draft.
-If you add new schedules, it will become Active.`;
+    return t('reminder.editWarningExpiredSchedules');
   }
   return null;
 };

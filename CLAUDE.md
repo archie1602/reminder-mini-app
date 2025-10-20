@@ -87,6 +87,43 @@ import { routes } from '@/navigation/routes.tsx';
 import { Root } from '@/components/Root.tsx';
 ```
 
+### Internationalization (i18n)
+
+This project uses **i18next** and **react-i18next** for internationalization with support for English and Russian.
+
+**IMPORTANT RULE: Always use locale translations - never hardcode user-facing text in English or any other language.**
+
+**Translation Files:**
+- [src/i18n/locales/en.json](src/i18n/locales/en.json) - English translations
+- [src/i18n/locales/ru.json](src/i18n/locales/ru.json) - Russian translations
+
+**Usage in Components:**
+```typescript
+import { useTranslation } from 'react-i18next';
+
+const MyComponent = () => {
+  const { t } = useTranslation();
+  return <button>{t('common.save')}</button>;
+};
+```
+
+**Usage in Utility Functions:**
+```typescript
+import { TFunction } from 'i18next';
+
+export const myFunction = (param: string, t: TFunction): string => {
+  return t('validation.required');
+};
+```
+
+**Guidelines:**
+- All user-facing text must come from translation files
+- Never hardcode English strings in JSX or UI code
+- Use `t('key')` without fallback strings (e.g., avoid `t('key', 'fallback')`)
+- For new text, add keys to both `en.json` and `ru.json`
+- Pass `TFunction` as a parameter to utility functions that need translations
+- Language is automatically detected from Telegram user's `language_code`
+
 ## Deployment Configuration
 
 Before deploying to GitHub Pages:

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -15,12 +16,17 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
   onConfirm,
   onCancel,
   variant = 'warning',
 }) => {
+  const { t } = useTranslation();
+
+  // Use translations as defaults if not provided
+  const finalConfirmText = confirmText || t('modal.defaultConfirm');
+  const finalCancelText = cancelText || t('modal.defaultCancel');
   if (!isOpen) return null;
 
   const variantStyles = {
@@ -69,13 +75,13 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             onClick={onCancel}
             className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
           >
-            {cancelText}
+            {finalCancelText}
           </button>
           <button
             onClick={onConfirm}
             className={`px-4 py-2 text-white rounded-lg transition-colors ${styles.confirmBtn}`}
           >
-            {confirmText}
+            {finalConfirmText}
           </button>
         </div>
       </div>

@@ -213,7 +213,7 @@ export const EditPage: FC = () => {
           {reminder.status === ReminderState.Ended && (
             <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-600 dark:text-yellow-400 p-3 rounded-lg mb-4">
               <p className="text-sm">
-                {t('reminder.endedEditInfo', 'This reminder has ended. Expired schedules have been removed. Adding new schedules will reactivate it.')}
+                {t('reminder.endedEditInfo')}
               </p>
             </div>
           )}

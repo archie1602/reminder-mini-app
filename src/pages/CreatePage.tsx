@@ -56,7 +56,7 @@ export const CreatePage: FC = () => {
 
   useTelegramBackButton();
   useTelegramMainButton({
-    text: isDraft ? t('reminder.saveAsDraft', 'Save as Draft') : t('common.save'),
+    text: isDraft ? t('reminder.saveAsDraft') : t('common.save'),
     onClick: handleSubmit(onSubmit),
     enabled: !hasErrors && !createMutation.isPending,
     visible: true,
@@ -145,7 +145,7 @@ export const CreatePage: FC = () => {
             disabled={hasErrors || createMutation.isPending}
             fullWidth
           >
-            {isDraft ? t('reminder.saveAsDraft', 'Save as Draft') : t('common.save')}
+            {isDraft ? t('reminder.saveAsDraft') : t('common.save')}
           </Button>
         </form>
       </div>
