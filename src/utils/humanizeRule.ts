@@ -1,13 +1,14 @@
 import { Rule, RuleType, RuleDateMode, RuleTimeMode } from '@/api/types';
 import dayjs from 'dayjs';
 import { TFunction } from 'i18next';
+import { formatTime } from './timeFormat';
 
 export const humanizeRule = (rule: Rule, t: TFunction): string => {
   switch (rule.type) {
     case RuleType.OneTime:
       if (!rule.oneTime) return '';
       const date = dayjs(rule.oneTime.fireAt).format('LL');
-      const time = dayjs(rule.oneTime.fireAt).format('HH:mm');
+      const time = formatTime(rule.oneTime.fireAt);
       return t('humanize.oneTime', { date, time });
 
     case RuleType.Interval:
@@ -35,7 +36,7 @@ const humanizeComplexRule = (complex: Rule['complex'], t: TFunction): string => 
   switch (date.mode) {
     case RuleDateMode.Daily:
       if (time.mode === RuleTimeMode.ExactTime && time.at) {
-        return t('humanize.daily', { time: time.at.substring(0, 5) });
+        return t('humanize.daily', { time: formatTime(time.at) });
       }
       datePart = t('dateMode.DAILY');
       break;
@@ -44,7 +45,7 @@ const humanizeComplexRule = (complex: Rule['complex'], t: TFunction): string => 
       if (date.at) {
         const formattedDate = dayjs(date.at).format('LL');
         if (time.mode === RuleTimeMode.ExactTime && time.at) {
-          return t('humanize.exactDate', { date: formattedDate, time: time.at.substring(0, 5) });
+          return t('humanize.exactDate', { date: formattedDate, time: formatTime(time.at) });
         }
         datePart = formattedDate;
       }
@@ -55,7 +56,7 @@ const humanizeComplexRule = (complex: Rule['complex'], t: TFunction): string => 
         const from = dayjs(date.range.from).format('LL');
         const to = dayjs(date.range.to).format('LL');
         if (time.mode === RuleTimeMode.ExactTime && time.at) {
-          return t('humanize.dateRange', { from, to, time: time.at.substring(0, 5) });
+          return t('humanize.dateRange', { from, to, time: formatTime(time.at) });
         }
         datePart = `${from} - ${to}`;
       }
@@ -68,7 +69,7 @@ const humanizeComplexRule = (complex: Rule['complex'], t: TFunction): string => 
           .map((d) => t(`weekDayShort.${d}`))
           .join(', ');
         if (time.mode === RuleTimeMode.ExactTime && time.at) {
-          return t('humanize.weekDays', { days, time: time.at.substring(0, 5) });
+          return t('humanize.weekDays', { days, time: formatTime(time.at) });
         }
         datePart = days;
       }
@@ -78,7 +79,7 @@ const humanizeComplexRule = (complex: Rule['complex'], t: TFunction): string => 
       if (date.monthDays && date.monthDays.length > 0) {
         const days = date.monthDays.sort((a, b) => a - b).join(', ');
         if (time.mode === RuleTimeMode.ExactTime && time.at) {
-          return t('humanize.monthDays', { days, time: time.at.substring(0, 5) });
+          return t('humanize.monthDays', { days, time: formatTime(time.at) });
         }
         datePart = days;
       }
@@ -92,7 +93,7 @@ const humanizeComplexRule = (complex: Rule['complex'], t: TFunction): string => 
           .join(', ');
         const days = date.monthDays.sort((a, b) => a - b).join(', ');
         if (time.mode === RuleTimeMode.ExactTime && time.at) {
-          return t('humanize.yearDays', { months, days, time: time.at.substring(0, 5) });
+          return t('humanize.yearDays', { months, days, time: formatTime(time.at) });
         }
         datePart = `${months} ${days}`;
       }
@@ -101,10 +102,10 @@ const humanizeComplexRule = (complex: Rule['complex'], t: TFunction): string => 
 
   // Humanize time part
   if (time.mode === RuleTimeMode.ExactTime && time.at) {
-    timePart = time.at.substring(0, 5);
+    timePart = formatTime(time.at);
   } else if (time.mode === RuleTimeMode.Range && time.stepRange) {
-    const from = time.stepRange.from.substring(0, 5);
-    const to = time.stepRange.to.substring(0, 5);
+    const from = formatTime(time.stepRange.from);
+    const to = formatTime(time.stepRange.to);
     const step = `${time.stepRange.step.every} ${t(`timeUnit.${time.stepRange.step.unit}`).toLowerCase()}`;
     return t('humanize.timeRange', { date: datePart, from, to, step });
   }

@@ -108,6 +108,7 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
                   date: { ...value.date, range: { from, to: value.date.range?.to || from } },
                 })
               }
+              max={value.date.range?.to}
             />
             <DatePicker
               label={t('rule.to')}
@@ -206,6 +207,7 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
                   },
                 })
               }
+              max={value.time.stepRange?.to?.substring(0, 5)}
             />
             <TimePicker
               label={t('rule.to')}
@@ -223,6 +225,7 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
                   },
                 })
               }
+              min={value.time.stepRange?.from?.substring(0, 5)}
             />
             <div className="flex gap-2">
               <Input

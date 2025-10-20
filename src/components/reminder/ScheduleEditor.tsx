@@ -17,6 +17,7 @@ interface ScheduleEditorProps {
   watch: UseFormWatch<CreateReminderFormData>;
   onRemove?: () => void;
   showRemoveButton?: boolean;
+  timezone: string;
 }
 
 export const ScheduleEditor: FC<ScheduleEditorProps> = ({
@@ -25,6 +26,7 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
   watch,
   onRemove,
   showRemoveButton = false,
+  timezone,
 }) => {
   const { t } = useTranslation();
   const [ruleType, setRuleType] = useState<RuleType>(RuleType.OneTime);
@@ -44,9 +46,11 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
     let newRule;
     switch (type) {
       case RuleType.OneTime:
+        // Get current time + 1 hour in the reminder's timezone, but store as timezone-agnostic string
+        const fireAt = dayjs().tz(timezone).add(1, 'hour').format('YYYY-MM-DDTHH:mm:ss');
         newRule = {
           type: RuleType.OneTime,
-          oneTime: { fireAt: dayjs().add(1, 'hour').toISOString() },
+          oneTime: { fireAt },
         };
         break;
       case RuleType.Interval:
@@ -102,6 +106,7 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
           onChange={(oneTime) =>
             setValue(`schedules.${index}.rule.oneTime`, oneTime, { shouldValidate: true })
           }
+          timezone={timezone}
         />
       )}
 

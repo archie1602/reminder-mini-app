@@ -176,11 +176,16 @@ export const EditPage: FC = () => {
   });
 
   const handleAddSchedule = () => {
+    // Get the current timezone from the form
+    const currentTimezone = watch('timeZone') || getDefaultTimezone();
+    // Get current time + 1 hour in the reminder's timezone, but store as timezone-agnostic string
+    const fireAt = dayjs().tz(currentTimezone).add(1, 'hour').format('YYYY-MM-DDTHH:mm:ss');
+
     append({
       rule: {
         type: RuleType.OneTime,
         oneTime: {
-          fireAt: dayjs().add(1, 'hour').format('YYYY-MM-DDTHH:mm:ss'),
+          fireAt,
         },
       },
     });
@@ -260,6 +265,7 @@ export const EditPage: FC = () => {
                   watch={watch}
                   onRemove={() => remove(index)}
                   showRemoveButton={fields.length > 1}
+                  timezone={watch('timeZone') || getDefaultTimezone()}
                 />
               ))}
             </div>

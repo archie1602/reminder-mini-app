@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { formatDateTime } from '@/utils/timeFormat';
 
 interface NextRunAtProps {
   nextRunAt: string;
@@ -21,7 +22,7 @@ export const NextRunAt: FC<NextRunAtProps> = ({ nextRunAt }) => {
   }, []);
 
   const nextRunDate = dayjs(nextRunAt);
-  const absoluteTime = nextRunDate.format('MMM D, YYYY [at] h:mm A');
+  const absoluteTime = formatDateTime(nextRunAt);
   const relativeTime = nextRunDate.fromNow();
 
   return (

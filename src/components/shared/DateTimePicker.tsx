@@ -32,9 +32,10 @@ interface DatePickerProps {
   value: string;
   onChange: (value: string) => void;
   min?: string;
+  max?: string;
 }
 
-export const DatePicker: FC<DatePickerProps> = ({ label, error, value, onChange, min }) => {
+export const DatePicker: FC<DatePickerProps> = ({ label, error, value, onChange, min, max }) => {
   // Default min to today if not provided
   const minValue = min || dayjs().format('YYYY-MM-DD');
 
@@ -46,6 +47,7 @@ export const DatePicker: FC<DatePickerProps> = ({ label, error, value, onChange,
       value={value}
       onChange={(e) => onChange(e.target.value)}
       min={minValue}
+      max={max}
     />
   );
 };
@@ -56,9 +58,10 @@ interface TimePickerProps {
   value: string;
   onChange: (value: string) => void;
   min?: string;
+  max?: string;
 }
 
-export const TimePicker: FC<TimePickerProps> = ({ label, error, value, onChange, min }) => {
+export const TimePicker: FC<TimePickerProps> = ({ label, error, value, onChange, min, max }) => {
   return (
     <Input
       type="time"
@@ -67,6 +70,7 @@ export const TimePicker: FC<TimePickerProps> = ({ label, error, value, onChange,
       value={value}
       onChange={(e) => onChange(e.target.value)}
       min={min}
+      max={max}
     />
   );
 };

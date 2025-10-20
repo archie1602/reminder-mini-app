@@ -11,6 +11,12 @@ const ruleTimeModeSchema = z.nativeEnum(RuleTimeMode);
 const dateOnlyRangeSchema = z.object({
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.invalidDateFormat'),
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.invalidDateFormat'),
+}).refine((data) => {
+  // Validate that 'to' date is >= 'from' date
+  return dayjs(data.to).isSameOrAfter(dayjs(data.from), 'day');
+}, {
+  message: 'validation.toDateMustBeAfterFromDate',
+  path: ['to'],
 });
 
 const timeRangeStepSchema = z.object({
@@ -22,6 +28,14 @@ const timeOnlyWithStepRangeSchema = z.object({
   from: z.string().regex(/^\d{2}:\d{2}:\d{2}$/, 'validation.invalidTimeFormat'),
   to: z.string().regex(/^\d{2}:\d{2}:\d{2}$/, 'validation.invalidTimeFormat'),
   step: timeRangeStepSchema,
+}).refine((data) => {
+  // Validate that 'to' time is >= 'from' time
+  const fromTime = dayjs(`2000-01-01T${data.from}`);
+  const toTime = dayjs(`2000-01-01T${data.to}`);
+  return toTime.isSameOrAfter(fromTime);
+}, {
+  message: 'validation.toTimeMustBeAfterFromTime',
+  path: ['to'],
 });
 
 // Rule type schemas

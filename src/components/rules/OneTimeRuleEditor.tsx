@@ -7,27 +7,38 @@ import dayjs from 'dayjs';
 interface OneTimeRuleEditorProps {
   value: RuleOneTime;
   onChange: (value: RuleOneTime) => void;
+  timezone: string;
 }
 
-export const OneTimeRuleEditor: FC<OneTimeRuleEditorProps> = ({ value, onChange }) => {
+export const OneTimeRuleEditor: FC<OneTimeRuleEditorProps> = ({ value, onChange, timezone }) => {
   const { t } = useTranslation();
 
   const handleDateTimeChange = (datetime: string) => {
-    // Format as ISO datetime without Z suffix
-    const isoDateTime = dayjs(datetime).format('YYYY-MM-DDTHH:mm:ss');
+    // datetime-local format: "2025-10-19T17:40"
+    // Store it directly with seconds appended, no timezone conversion
+    const isoDateTime = datetime ? `${datetime}:00` : '';
     onChange({ fireAt: isoDateTime });
   };
 
-  // Convert ISO to datetime-local format
-  const localDateTime = value.fireAt ? dayjs(value.fireAt).format('YYYY-MM-DDTHH:mm') : '';
+  // Display the stored datetime directly without any timezone conversion
+  // Just strip the seconds: "2025-10-19T17:40:00" -> "2025-10-19T17:40"
+  const localDateTime = value.fireAt
+    ? value.fireAt.substring(0, 16) // Take only YYYY-MM-DDTHH:mm part
+    : '';
 
-  // Check if the selected date is in the past
+  // For validation, interpret the stored datetime as being in the reminder's timezone
   const error = useMemo(() => {
-    if (value.fireAt && dayjs(value.fireAt).isBefore(dayjs())) {
-      return t('validation.futureDateTime');
+    if (value.fireAt) {
+      // Parse the stored datetime string as if it's in the reminder's timezone
+      const fireAtInTimezone = dayjs.tz(value.fireAt, timezone);
+      const nowInTimezone = dayjs().tz(timezone);
+
+      if (fireAtInTimezone.isBefore(nowInTimezone)) {
+        return t('validation.futureDateTime');
+      }
     }
     return undefined;
-  }, [value.fireAt, t]);
+  }, [value.fireAt, t, timezone]);
 
   return (
     <div className="space-y-4">
