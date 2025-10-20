@@ -16,7 +16,6 @@ interface ScheduleEditorProps {
   setValue: UseFormSetValue<CreateReminderFormData>;
   watch: UseFormWatch<CreateReminderFormData>;
   onRemove?: () => void;
-  showRemoveButton?: boolean;
   timezone: string;
 }
 
@@ -25,7 +24,6 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
   setValue,
   watch,
   onRemove,
-  showRemoveButton = false,
   timezone,
 }) => {
   const { t } = useTranslation();
@@ -81,7 +79,7 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
 
   return (
     <div className="border border-[var(--tg-theme-hint-color)]/20 rounded-lg p-4 space-y-4">
-      {showRemoveButton && (
+      {onRemove && (
         <div className="flex justify-end">
           <Button variant="danger" onClick={handleRemove} className="text-sm py-1 px-3" type="button">
             {t('common.remove')}

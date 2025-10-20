@@ -11,6 +11,7 @@ import { Textarea } from '@/components/shared/Textarea';
 import { Button } from '@/components/shared/Button';
 import { Select } from '@/components/shared/Select';
 import { ScheduleEditor } from '@/components/reminder/ScheduleEditor';
+import { NoSchedulesMessage } from '@/components/reminder/NoSchedulesMessage';
 import { FormValidationSummary } from '@/components/shared/FormValidationSummary';
 import { RuleType } from '@/api/types';
 import { getDefaultTimezone, commonTimezones } from '@/utils/timezones';
@@ -130,16 +131,11 @@ export const CreatePage: FC = () => {
                 setValue={setValue}
                 watch={watch}
                 onRemove={() => remove(index)}
-                showRemoveButton={true} // Always show remove button to allow creating DRAFT
                 timezone={watch('timeZone') || getDefaultTimezone()}
               />
             ))}
 
-            {fields.length === 0 && (
-              <div className="text-sm text-[var(--tg-theme-hint-color)] text-center py-4 bg-[var(--tg-theme-secondary-bg-color)] rounded-lg">
-                {t('reminder.noSchedules', 'No schedules added. The reminder will be saved as a draft.')}
-              </div>
-            )}
+            {fields.length === 0 && <NoSchedulesMessage />}
           </div>
 
           <FormValidationSummary errors={errors} isVisible={hasErrors} />

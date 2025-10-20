@@ -11,6 +11,7 @@ import { Textarea } from '@/components/shared/Textarea';
 import { Button } from '@/components/shared/Button';
 import { Select } from '@/components/shared/Select';
 import { ScheduleEditor } from '@/components/reminder/ScheduleEditor';
+import { NoSchedulesMessage } from '@/components/reminder/NoSchedulesMessage';
 import { FormValidationSummary } from '@/components/shared/FormValidationSummary';
 import { SkeletonForm, FadeIn } from '@/components/shared/Skeleton';
 import { RuleType, ReminderState } from '@/api/types';
@@ -264,10 +265,11 @@ export const EditPage: FC = () => {
                   setValue={setValue}
                   watch={watch}
                   onRemove={() => remove(index)}
-                  showRemoveButton={fields.length > 1}
                   timezone={watch('timeZone') || getDefaultTimezone()}
                 />
               ))}
+
+              {fields.length === 0 && <NoSchedulesMessage />}
             </div>
 
             <FormValidationSummary errors={errors} isVisible={hasErrors} />
