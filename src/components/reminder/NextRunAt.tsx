@@ -8,7 +8,7 @@ interface NextRunAtProps {
   timeZone?: string | null;
 }
 
-export const NextRunAt: FC<NextRunAtProps> = ({ nextRunAt }) => {
+export const NextRunAt: FC<NextRunAtProps> = ({ nextRunAt, timeZone }) => {
   const { t } = useTranslation();
   const [, setCurrentTime] = useState(Date.now());
 
@@ -35,6 +35,11 @@ export const NextRunAt: FC<NextRunAtProps> = ({ nextRunAt }) => {
         <p className="text-sm text-blue-600 dark:text-blue-400">
           {absoluteTime} ({relativeTime})
         </p>
+        {timeZone && (
+          <p className="text-xs text-blue-500/70 dark:text-blue-400/70 mt-1">
+            {timeZone}
+          </p>
+        )}
       </div>
     </div>
   );

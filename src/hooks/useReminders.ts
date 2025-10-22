@@ -93,7 +93,7 @@ export const usePauseReminder = () => {
     mutationFn: (id: string) => remindersApi.pause(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
-      toast.success(t('toast.pauseSuccess'));
+      toast.success(t('toast.statusChangeSuccess'));
     },
     onError: () => {
       toast.error(t('toast.error'));
@@ -109,7 +109,7 @@ export const useActivateReminder = () => {
     mutationFn: (id: string) => remindersApi.activate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
-      toast.success(t('toast.activateSuccess'));
+      toast.success(t('toast.statusChangeSuccess'));
     },
     onError: () => {
       toast.error(t('toast.error'));
@@ -125,7 +125,7 @@ export const useConvertToDraft = () => {
     mutationFn: (id: string) => remindersApi.convertToDraft(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
-      toast.success(t('toast.convertToDraftSuccess'));
+      toast.success(t('toast.statusChangeSuccess'));
     },
     onError: () => {
       toast.error(t('toast.error'));

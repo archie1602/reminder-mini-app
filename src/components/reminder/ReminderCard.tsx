@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Pencil, Trash2, Pause, Play } from 'lucide-react';
 import { UserReminderResponse, ReminderState } from '@/api/types';
 import { Card } from '@/components/shared/Card';
 import { Button } from '@/components/shared/Button';
@@ -136,14 +137,30 @@ export const ReminderCard: FC<ReminderCardProps> = ({ reminder }) => {
               }
             };
 
+            const getIcon = () => {
+              switch (action.type) {
+                case 'edit':
+                  return <Pencil size={18} />;
+                case 'delete':
+                  return <Trash2 size={18} />;
+                case 'pause':
+                  return <Pause size={18} />;
+                case 'activate':
+                  return <Play size={18} />;
+                default:
+                  return null;
+              }
+            };
+
             return (
               <Button
                 key={action.type}
                 variant={action.variant || 'secondary'}
                 onClick={handleAction}
-                className="flex-1"
+                className="flex-1 flex items-center justify-center"
+                aria-label={t(action.label)}
               >
-                {t(action.label)}
+                {getIcon()}
               </Button>
             );
           })}

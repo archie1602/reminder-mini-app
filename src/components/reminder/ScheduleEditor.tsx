@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { Trash2 } from 'lucide-react';
 import { CreateReminderFormData } from '@/schemas/reminder.schema';
 import { Segmented } from '@/components/shared/Segmented';
 import { Button } from '@/components/shared/Button';
@@ -82,7 +83,7 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
       {onRemove && (
         <div className="flex justify-end">
           <Button variant="danger" onClick={handleRemove} className="text-sm py-1 px-3" type="button">
-            {t('common.remove')}
+            <Trash2 size={18} />
           </Button>
         </div>
       )}
