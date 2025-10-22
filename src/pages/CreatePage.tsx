@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
@@ -7,6 +7,8 @@ import { createReminderSchema, CreateReminderFormData } from '@/schemas/reminder
 import { useCreateReminder } from '@/hooks/useReminders';
 import { useTelegramMainButton } from '@/hooks/useTelegramMainButton';
 import { useTelegramBackButton } from '@/hooks/useTelegramBackButton';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
+import { closingBehavior } from '@telegram-apps/sdk-react';
 import { Textarea } from '@/components/shared/Textarea';
 import { Button } from '@/components/shared/Button';
 import { Select } from '@/components/shared/Select';
@@ -26,7 +28,7 @@ export const CreatePage: FC = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     setValue,
     watch,
   } = useForm<CreateReminderFormData>({
@@ -54,7 +56,45 @@ export const CreatePage: FC = () => {
   const watchedSchedules = watch('schedules') || [];
   const isDraft = watchedSchedules.length === 0;
 
-  useTelegramBackButton();
+  // Check for unsaved changes
+  const hasUnsavedChanges = useMemo(() => {
+    return isDirty;
+  }, [isDirty]);
+
+  // Use unsaved changes warning hook - returns a callback with confirmation
+  const handleBackWithConfirmation = useUnsavedChangesWarning({
+    hasUnsavedChanges,
+    onBackClick: () => navigate('/'),
+  });
+
+  // Enable/disable closing confirmation based on unsaved changes
+  useEffect(() => {
+    if (!closingBehavior.mount.isAvailable()) return;
+
+    // Mount if not already mounted
+    if (!closingBehavior.isMounted()) {
+      closingBehavior.mount();
+    }
+
+    if (hasUnsavedChanges) {
+      if (closingBehavior.enableConfirmation.isAvailable()) {
+        closingBehavior.enableConfirmation();
+      }
+    } else {
+      if (closingBehavior.disableConfirmation.isAvailable()) {
+        closingBehavior.disableConfirmation();
+      }
+    }
+
+    // Cleanup: disable confirmation when leaving the page
+    return () => {
+      if (closingBehavior.disableConfirmation.isAvailable()) {
+        closingBehavior.disableConfirmation();
+      }
+    };
+  }, [hasUnsavedChanges]);
+
+  useTelegramBackButton(handleBackWithConfirmation);
   useTelegramMainButton({
     text: isDraft ? t('reminder.saveAsDraft') : t('common.save'),
     onClick: handleSubmit(onSubmit),

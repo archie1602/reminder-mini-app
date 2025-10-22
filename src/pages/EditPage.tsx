@@ -7,6 +7,8 @@ import { createReminderSchema, CreateReminderFormData } from '@/schemas/reminder
 import { useReminder, useUpdateReminder } from '@/hooks/useReminders';
 import { useTelegramMainButton } from '@/hooks/useTelegramMainButton';
 import { useTelegramBackButton } from '@/hooks/useTelegramBackButton';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
+import { closingBehavior } from '@telegram-apps/sdk-react';
 import { Textarea } from '@/components/shared/Textarea';
 import { Button } from '@/components/shared/Button';
 import { Select } from '@/components/shared/Select';
@@ -168,7 +170,40 @@ export const EditPage: FC = () => {
 
   const hasErrors = hasValidationErrors(errors);
 
-  useTelegramBackButton();
+  // Use unsaved changes warning hook - only show for actual unsaved changes
+  const handleBackWithConfirmation = useUnsavedChangesWarning({
+    hasUnsavedChanges: hasChanges,
+    onBackClick: () => navigate('/'),
+  });
+
+  // Enable/disable closing confirmation based on unsaved changes
+  useEffect(() => {
+    if (!closingBehavior.mount.isAvailable()) return;
+
+    // Mount if not already mounted
+    if (!closingBehavior.isMounted()) {
+      closingBehavior.mount();
+    }
+
+    if (hasChanges) {
+      if (closingBehavior.enableConfirmation.isAvailable()) {
+        closingBehavior.enableConfirmation();
+      }
+    } else {
+      if (closingBehavior.disableConfirmation.isAvailable()) {
+        closingBehavior.disableConfirmation();
+      }
+    }
+
+    // Cleanup: disable confirmation when leaving the page
+    return () => {
+      if (closingBehavior.disableConfirmation.isAvailable()) {
+        closingBehavior.disableConfirmation();
+      }
+    };
+  }, [hasChanges]);
+
+  useTelegramBackButton(handleBackWithConfirmation);
   useTelegramMainButton({
     text: t('common.save'),
     onClick: handleSubmit(onSubmit),

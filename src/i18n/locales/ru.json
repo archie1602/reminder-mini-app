@@ -170,7 +170,11 @@
   "modal": {
     "editEndedReminder": "Редактировать завершённое напоминание",
     "defaultConfirm": "Подтвердить",
-    "defaultCancel": "Отменить"
+    "defaultCancel": "Отменить",
+    "unsavedChangesTitle": "Несохранённые изменения",
+    "unsavedChangesMessage": "Вы уверены, что хотите уйти? Ваши изменения не будут сохранены.",
+    "leaveButton": "Уйти",
+    "stayButton": "Остаться"
   },
   "indexPage": {
     "title": "Данные запуска приложения",

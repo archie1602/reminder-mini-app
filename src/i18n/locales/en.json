@@ -170,7 +170,11 @@
   "modal": {
     "editEndedReminder": "Edit Ended Reminder",
     "defaultConfirm": "Confirm",
-    "defaultCancel": "Cancel"
+    "defaultCancel": "Cancel",
+    "unsavedChangesTitle": "Unsaved Changes",
+    "unsavedChangesMessage": "Are you sure you want to leave? Your changes will not be saved.",
+    "leaveButton": "Leave",
+    "stayButton": "Stay"
   },
   "indexPage": {
     "title": "Application Launch Data",

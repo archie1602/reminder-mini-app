@@ -12,6 +12,7 @@ import {
   retrieveLaunchParams,
   emitEvent,
   miniApp,
+  swipeBehavior,
 } from '@telegram-apps/sdk-react';
 
 /**
@@ -71,4 +72,12 @@ export async function init(options: {
   mountViewport.isAvailable() && mountViewport().then(() => {
     bindViewportCssVars();
   });
+
+  // Mount and configure swipe behavior to prevent accidental app closure
+  if (swipeBehavior.mount.isAvailable()) {
+    swipeBehavior.mount();
+    if (swipeBehavior.disableVertical.isAvailable()) {
+      swipeBehavior.disableVertical();
+    }
+  }
 }
