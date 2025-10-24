@@ -22,6 +22,8 @@ import { hasValidationErrors } from '@/utils/formHelpers';
 import { canEditReminder, isScheduleExpired } from '@/utils/reminderHelpers';
 import dayjs from 'dayjs';
 
+const MAX_SCHEDULES = 5;
+
 export const EditPage: FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -303,9 +305,15 @@ export const EditPage: FC = () => {
                 />
               ))}
 
-              <Button variant="secondary" onClick={handleAddSchedule} className="text-sm py-2 px-4 w-full" type="button">
-                {t('common.addSchedule')}
-              </Button>
+              {fields.length < MAX_SCHEDULES ? (
+                <Button variant="secondary" onClick={handleAddSchedule} className="text-sm py-2 px-4 w-full" type="button">
+                  {t('common.addSchedule')}
+                </Button>
+              ) : (
+                <div className="text-sm text-[var(--tg-theme-hint-color)] text-center py-2">
+                  ℹ️ {t('reminder.maxSchedulesReached')}
+                </div>
+              )}
             </div>
 
             <FormValidationSummary errors={errors} isVisible={hasErrors} />
