@@ -19,6 +19,7 @@ interface ScheduleEditorProps {
   onRemove?: () => void;
   timezone: string;
   isNew?: boolean;
+  hasError?: boolean;
 }
 
 export const ScheduleEditor = forwardRef<HTMLDivElement, ScheduleEditorProps>(({
@@ -28,6 +29,7 @@ export const ScheduleEditor = forwardRef<HTMLDivElement, ScheduleEditorProps>(({
   onRemove,
   timezone,
   isNew = false,
+  hasError = false,
 }, ref) => {
   const { t } = useTranslation();
   const [ruleType, setRuleType] = useState<RuleType>(RuleType.OneTime);
@@ -88,7 +90,11 @@ export const ScheduleEditor = forwardRef<HTMLDivElement, ScheduleEditorProps>(({
   return (
     <div
       ref={ref}
-      className={`border border-[var(--tg-theme-hint-color)]/20 rounded-lg p-4 space-y-4 ${
+      className={`border rounded-lg p-4 space-y-4 ${
+        hasError
+          ? 'border-red-500 bg-red-500/5'
+          : 'border-[var(--tg-theme-hint-color)]/20'
+      } ${
         isDeleting ? 'overflow-hidden' : ''
       } ${
         isNew ? 'animate-[fadeSlideIn_0.4s_ease-out]' : ''

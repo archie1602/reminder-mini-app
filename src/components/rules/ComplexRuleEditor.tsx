@@ -202,6 +202,7 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange,
             onChange={(weekDays) =>
               onChange({ ...value, date: { ...value.date, weekDays } })
             }
+            gridColumns={4}
           />
         )}
 
@@ -213,6 +214,7 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange,
             onChange={(monthDays) =>
               onChange({ ...value, date: { ...value.date, monthDays } })
             }
+            gridColumns={7}
           />
         )}
 
@@ -225,6 +227,7 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange,
               onChange={(months) =>
                 onChange({ ...value, date: { ...value.date, months } })
               }
+              gridColumns={3}
             />
             <MultiSelect
               label={t('rule.monthDays')}
@@ -233,6 +236,7 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange,
               onChange={(monthDays) =>
                 onChange({ ...value, date: { ...value.date, monthDays } })
               }
+              gridColumns={7}
             />
           </>
         )}

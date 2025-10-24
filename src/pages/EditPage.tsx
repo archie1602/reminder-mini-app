@@ -299,6 +299,7 @@ export const EditPage: FC = () => {
                   onRemove={() => remove(index)}
                   timezone={watch('timeZone') || getDefaultTimezone()}
                   isNew={index === fields.length - 1}
+                  hasError={!!errors.schedules?.[index]}
                 />
               ))}
 
