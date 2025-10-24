@@ -20,7 +20,8 @@
     "loadMore": "Load More",
     "pause": "Pause",
     "activate": "Activate",
-    "continue": "Continue"
+    "continue": "Continue",
+    "refresh": "Refresh"
   },
   "reminder": {
     "title": "Reminders",
@@ -45,7 +46,8 @@
     "statusDraft": "This reminder is a draft. Add schedules to activate it.",
     "statusPaused": "This reminder is paused and cannot be edited. Activate it first to make changes.",
     "statusEnded": "This reminder has ended. You can edit it to create new schedules.",
-    "editWarningExpiredSchedules": "This reminder has ended and some schedules have expired. When you save:\n- Expired schedules will be removed\n- If you add new schedules, the reminder will be reactivated\n- If you don't add schedules, it will remain ended"
+    "editWarningExpiredSchedules": "This reminder has ended and some schedules have expired. When you save:\n- Expired schedules will be removed\n- If you add new schedules, the reminder will be reactivated\n- If you don't add schedules, it will remain ended",
+    "updateAvailable": "Updates available"
   },
   "rule": {
     "type": "Schedule type",

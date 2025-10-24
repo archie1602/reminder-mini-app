@@ -30,7 +30,8 @@ export const OneTimeRuleEditor: FC<OneTimeRuleEditorProps> = ({ value, onChange,
   const error = useMemo(() => {
     if (value.fireAt) {
       // Parse the stored datetime string as if it's in the reminder's timezone
-      const fireAtInTimezone = dayjs.tz(value.fireAt, timezone);
+      // Use format parameter to explicitly tell dayjs to treat the string as local time in the timezone
+      const fireAtInTimezone = dayjs.tz(value.fireAt, 'YYYY-MM-DDTHH:mm:ss', timezone);
       const nowInTimezone = dayjs().tz(timezone);
 
       if (fireAtInTimezone.isBefore(nowInTimezone)) {

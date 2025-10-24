@@ -47,13 +47,10 @@ const timeOnlyWithStepRangeSchema = z.object({
 // Rule type schemas
 const ruleOneTimeSchema = z.object({
   fireAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, 'validation.invalidDatetime'),
-}).refine((data) => {
-  // Validate that fireAt is in the future
-  return dayjs(data.fireAt).isAfter(dayjs());
-}, {
-  message: 'validation.futureDateTime',
-  path: ['fireAt'],
 });
+// Note: Future datetime validation is handled at the UI level (OneTimeRuleEditor)
+// with proper timezone awareness. Schema-level validation is skipped because
+// the timezone context is not available at this level.
 
 const ruleIntervalSchema = z.object({
   every: z.number().int().positive('validation.mustBePositive'),
