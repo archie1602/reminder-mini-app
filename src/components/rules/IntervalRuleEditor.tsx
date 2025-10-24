@@ -18,14 +18,31 @@ export const IntervalRuleEditor: FC<IntervalRuleEditorProps> = ({ value, onChang
     { value: TimeUnit.Days, label: t('timeUnit.DAYS') },
   ];
 
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const numValue = parseInt(e.target.value);
+    // Enforce minimum value of 1 when user leaves the field
+    if (isNaN(numValue) || numValue < 1) {
+      onChange({ ...value, every: 1 });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Input
         type="number"
         label={t('rule.every')}
-        value={value.every}
-        onChange={(e) => onChange({ ...value, every: parseInt(e.target.value) || 1 })}
-        min={1}
+        value={value.every === 0 ? '' : value.every}
+        onChange={(e) => {
+          const inputValue = e.target.value;
+          if (inputValue === '') {
+            // Allow empty input during typing
+            onChange({ ...value, every: 0 });
+          } else {
+            const numValue = parseInt(inputValue);
+            onChange({ ...value, every: isNaN(numValue) ? 0 : numValue });
+          }
+        }}
+        onBlur={handleBlur}
       />
       <Select
         label={t('rule.unit')}

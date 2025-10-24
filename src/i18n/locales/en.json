@@ -139,6 +139,7 @@
     "invalidTimeRange": "Please set a valid time range",
     "noChangesDetected": "No changes detected. Please make changes before saving.",
     "futureDateTime": "Date and time should be in the future",
+    "futureTime": "Time should be in the future",
     "toDateMustBeAfterFromDate": "'To' date must be greater than or equal to 'From' date",
     "toTimeMustBeAfterFromTime": "'To' time must be greater than or equal to 'From' time",
     "invalidTimezone": "Invalid timezone",

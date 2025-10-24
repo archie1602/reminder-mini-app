@@ -12,7 +12,8 @@ interface DateTimePickerProps {
 
 export const DateTimePicker: FC<DateTimePickerProps> = ({ label, error, value, onChange, min }) => {
   // Default min to current datetime if not provided
-  const minValue = min || dayjs().format('YYYY-MM-DDTHH:mm');
+  // Recalculate on each render to ensure it stays current
+  const minValue = min !== undefined ? min : dayjs().format('YYYY-MM-DDTHH:mm');
 
   return (
     <Input
@@ -37,7 +38,8 @@ interface DatePickerProps {
 
 export const DatePicker: FC<DatePickerProps> = ({ label, error, value, onChange, min, max }) => {
   // Default min to today if not provided
-  const minValue = min || dayjs().format('YYYY-MM-DD');
+  // Recalculate on each render to ensure it stays current
+  const minValue = min !== undefined ? min : dayjs().format('YYYY-MM-DD');
 
   return (
     <Input

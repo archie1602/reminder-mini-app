@@ -50,7 +50,7 @@ export const FormValidationSummary: FC<FormValidationSummaryProps> = ({ errors, 
           <ul className="space-y-1 text-sm text-red-400">
             {errorMessages.map((message, index) => (
               <li key={index} className="flex items-start gap-2">
-                <span className="mt-1">•</span>
+                <span>•</span>
                 <span>{message}</span>
               </li>
             ))}

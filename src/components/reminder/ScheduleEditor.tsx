@@ -140,6 +140,7 @@ export const ScheduleEditor = forwardRef<HTMLDivElement, ScheduleEditorProps>(({
           onChange={(complex) =>
             setValue(`schedules.${index}.rule.complex`, complex, { shouldValidate: true })
           }
+          timezone={timezone}
         />
       )}
     </div>

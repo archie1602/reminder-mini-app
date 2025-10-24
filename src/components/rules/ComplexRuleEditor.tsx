@@ -1,17 +1,19 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DatePicker, TimePicker } from '@/components/shared/DateTimePicker';
 import { Input } from '@/components/shared/Input';
 import { Select } from '@/components/shared/Select';
 import { MultiSelect } from '@/components/shared/MultiSelect';
 import { RuleComplex, RuleDateMode, RuleTimeMode, TimeUnit } from '@/api/types';
+import dayjs from 'dayjs';
 
 interface ComplexRuleEditorProps {
   value: RuleComplex;
   onChange: (value: RuleComplex) => void;
+  timezone: string;
 }
 
-export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange }) => {
+export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange, timezone }) => {
   const { t } = useTranslation();
 
   const dateModeOptions = [
@@ -73,6 +75,74 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
       },
     });
   };
+
+  // Validate time for cases where we need to ensure it's in the future
+  const timeError = useMemo(() => {
+    // Only validate for ExactTime mode
+    if (value.time.mode !== RuleTimeMode.ExactTime || !value.time.at) {
+      return undefined;
+    }
+
+    const selectedTime = value.time.at;
+    const nowInTimezone = dayjs().tz(timezone);
+    const todayDate = nowInTimezone.format('YYYY-MM-DD');
+
+    // Check if we need to validate based on date mode
+    let shouldValidate = false;
+
+    if (value.date.mode === RuleDateMode.Daily) {
+      // For daily schedules, always validate against current time
+      shouldValidate = true;
+    } else if (value.date.mode === RuleDateMode.ExactDate && value.date.at) {
+      // For exact date, only validate if the selected date is today
+      shouldValidate = value.date.at === todayDate;
+    } else if (value.date.mode === RuleDateMode.Range && value.date.range) {
+      // For date range, validate if today is within or equals the range start
+      const fromDate = value.date.range.from;
+      shouldValidate = fromDate === todayDate;
+    }
+
+    if (shouldValidate) {
+      // Parse the selected time in the reminder's timezone
+      const selectedDateTime = dayjs.tz(
+        `${todayDate}T${selectedTime}`,
+        'YYYY-MM-DDTHH:mm:ss',
+        timezone
+      );
+
+      if (selectedDateTime.isBefore(nowInTimezone)) {
+        return t('validation.futureTime');
+      }
+    }
+
+    return undefined;
+  }, [value.time.mode, value.time.at, value.date.mode, value.date.at, value.date.range, timezone, t]);
+
+  // Calculate minimum time for TimePicker when today is selected
+  const minTime = useMemo(() => {
+    if (value.time.mode !== RuleTimeMode.ExactTime) {
+      return undefined;
+    }
+
+    const nowInTimezone = dayjs().tz(timezone);
+    const todayDate = nowInTimezone.format('YYYY-MM-DD');
+
+    let isToday = false;
+
+    if (value.date.mode === RuleDateMode.Daily) {
+      isToday = true;
+    } else if (value.date.mode === RuleDateMode.ExactDate && value.date.at) {
+      isToday = value.date.at === todayDate;
+    } else if (value.date.mode === RuleDateMode.Range && value.date.range) {
+      isToday = value.date.range.from === todayDate;
+    }
+
+    if (isToday) {
+      return nowInTimezone.format('HH:mm');
+    }
+
+    return undefined;
+  }, [value.time.mode, value.date.mode, value.date.at, value.date.range, timezone]);
 
   return (
     <div className="space-y-6">
@@ -186,6 +256,8 @@ export const ComplexRuleEditor: FC<ComplexRuleEditorProps> = ({ value, onChange 
             onChange={(time) =>
               onChange({ ...value, time: { ...value.time, at: time + ':00' } })
             }
+            min={minTime}
+            error={timeError}
           />
         )}
 
