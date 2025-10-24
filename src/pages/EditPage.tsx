@@ -283,14 +283,11 @@ export const EditPage: FC = () => {
             />
 
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-[var(--tg-theme-text-color)]">
-                  {t('reminder.schedules')}
-                </h2>
-                <Button variant="secondary" onClick={handleAddSchedule} className="text-sm py-1 px-3" type="button">
-                  {t('common.addSchedule')}
-                </Button>
-              </div>
+              <h2 className="text-lg font-semibold text-[var(--tg-theme-text-color)]">
+                {t('reminder.schedules')}
+              </h2>
+
+              {fields.length === 0 && <NoSchedulesMessage />}
 
               {fields.map((field, index) => (
                 <ScheduleEditor
@@ -301,10 +298,13 @@ export const EditPage: FC = () => {
                   watch={watch}
                   onRemove={() => remove(index)}
                   timezone={watch('timeZone') || getDefaultTimezone()}
+                  isNew={index === fields.length - 1}
                 />
               ))}
 
-              {fields.length === 0 && <NoSchedulesMessage />}
+              <Button variant="secondary" onClick={handleAddSchedule} className="text-sm py-2 px-4 w-full" type="button">
+                {t('common.addSchedule')}
+              </Button>
             </div>
 
             <FormValidationSummary errors={errors} isVisible={hasErrors} />

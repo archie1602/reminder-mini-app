@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { Trash2 } from 'lucide-react';
@@ -18,17 +18,20 @@ interface ScheduleEditorProps {
   watch: UseFormWatch<CreateReminderFormData>;
   onRemove?: () => void;
   timezone: string;
+  isNew?: boolean;
 }
 
-export const ScheduleEditor: FC<ScheduleEditorProps> = ({
+export const ScheduleEditor = forwardRef<HTMLDivElement, ScheduleEditorProps>(({
   index,
   setValue,
   watch,
   onRemove,
   timezone,
-}) => {
+  isNew = false,
+}, ref) => {
   const { t } = useTranslation();
   const [ruleType, setRuleType] = useState<RuleType>(RuleType.OneTime);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const currentRule = watch(`schedules.${index}.rule`);
 
@@ -74,12 +77,25 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
 
   const handleRemove = () => {
     if (window.confirm(t('reminder.removeScheduleConfirm'))) {
-      onRemove?.();
+      setIsDeleting(true);
+      // Wait for animation to complete before actually removing
+      setTimeout(() => {
+        onRemove?.();
+      }, 300); // Match animation duration
     }
   };
 
   return (
-    <div className="border border-[var(--tg-theme-hint-color)]/20 rounded-lg p-4 space-y-4">
+    <div
+      ref={ref}
+      className={`border border-[var(--tg-theme-hint-color)]/20 rounded-lg p-4 space-y-4 ${
+        isDeleting ? 'overflow-hidden' : ''
+      } ${
+        isNew ? 'animate-[fadeSlideIn_0.4s_ease-out]' : ''
+      } ${
+        isDeleting ? 'animate-[fadeSlideOut_0.3s_ease-in_forwards]' : ''
+      }`}
+    >
       {onRemove && (
         <div className="flex justify-end">
           <Button variant="danger" onClick={handleRemove} className="text-sm py-1 px-3" type="button">
@@ -128,4 +144,6 @@ export const ScheduleEditor: FC<ScheduleEditorProps> = ({
       )}
     </div>
   );
-};
+});
+
+ScheduleEditor.displayName = 'ScheduleEditor';
