@@ -1,5 +1,6 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Search, Check } from 'lucide-react';
 
 export interface SearchableSelectOption {
   value: string | number;
@@ -157,7 +158,7 @@ export const SearchableSelect: FC<SearchableSelectProps> = ({
                 />
                 {/* Search Icon */}
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--tg-theme-hint-color)]">
-                  🔍
+                  <Search size={16} />
                 </span>
                 {/* Clear Button */}
                 {searchQuery && (
@@ -198,7 +199,7 @@ export const SearchableSelect: FC<SearchableSelectProps> = ({
                         }`}
                       >
                         <span>{option.label}</span>
-                        {isSelected && <span className="ml-2">✓</span>}
+                        {isSelected && <Check size={16} className="ml-2" />}
                       </button>
                     );
                   })}

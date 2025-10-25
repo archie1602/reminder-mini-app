@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { AlertTriangle, XCircle, Info } from 'lucide-react';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -31,15 +32,15 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   const variantStyles = {
     warning: {
-      icon: '⚠️',
+      icon: AlertTriangle,
       confirmBtn: 'bg-yellow-500 hover:bg-yellow-600',
     },
     danger: {
-      icon: '❌',
+      icon: XCircle,
       confirmBtn: 'bg-red-500 hover:bg-red-600',
     },
     info: {
-      icon: 'ℹ️',
+      icon: Info,
       confirmBtn: 'bg-blue-500 hover:bg-blue-600',
     },
   };
@@ -58,7 +59,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 m-4 max-w-md w-full max-h-[90vh] overflow-auto">
         {/* Header */}
         <div className="flex items-start mb-4">
-          <span className="text-2xl mr-3">{styles.icon}</span>
+          <styles.icon size={24} className="flex-shrink-0 mr-3 mt-0.5" />
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             {title}
           </h2>

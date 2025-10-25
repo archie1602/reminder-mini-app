@@ -1,4 +1,5 @@
 import { FC, useState, useRef, useEffect } from 'react';
+import { Info } from 'lucide-react';
 
 interface TooltipProps {
   content: string;
@@ -45,7 +46,7 @@ export const Tooltip: FC<TooltipProps> = ({ content, className = '' }) => {
         aria-label="Information"
         type="button"
       >
-        <span className="text-xs font-bold text-blue-600 dark:text-blue-400">i</span>
+        <Info size={16} className="text-blue-600 dark:text-blue-400" />
       </button>
 
       {/* Tooltip Content */}

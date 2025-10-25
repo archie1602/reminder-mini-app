@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldErrors } from 'react-hook-form';
+import { AlertTriangle } from 'lucide-react';
 
 interface FormValidationSummaryProps {
   errors: FieldErrors;
@@ -44,7 +45,7 @@ export const FormValidationSummary: FC<FormValidationSummaryProps> = ({ errors, 
   return (
     <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 space-y-2">
       <div className="flex items-start gap-2">
-        <span className="text-red-500 text-lg mt-0.5">⚠️</span>
+        <AlertTriangle size={16} className="text-red-500 flex-shrink-0 mt-1" />
         <div className="flex-1">
           <p className="font-medium text-red-500 mb-2">{t('validation.formErrors')}</p>
           <ul className="space-y-1 text-sm text-red-400">

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Info } from 'lucide-react';
 import { createReminderSchema, CreateReminderFormData } from '@/schemas/reminder.schema';
 import { useReminder, useUpdateReminder } from '@/hooks/useReminders';
 import { useTelegramMainButton } from '@/hooks/useTelegramMainButton';
@@ -311,8 +312,9 @@ export const EditPage: FC = () => {
                   {t('common.addSchedule')}
                 </Button>
               ) : (
-                <div className="text-sm text-[var(--tg-theme-hint-color)] text-center py-2">
-                  ℹ️ {t('reminder.maxSchedulesReached')}
+                <div className="text-sm text-[var(--tg-theme-hint-color)] text-center py-2 flex items-center justify-center gap-1">
+                  <Info size={16} className="inline-block flex-shrink-0" />
+                  {t('reminder.maxSchedulesReached')}
                 </div>
               )}
             </div>

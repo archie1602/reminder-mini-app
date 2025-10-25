@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
+import { RefreshCw, Clock } from 'lucide-react';
 import { formatDateTime } from '@/utils/timeFormat';
 import { useSharedTimer } from '@/hooks/useSharedTimer';
 import { REMINDERS_QUERY_KEY } from '@/hooks/useReminders';
@@ -40,7 +41,7 @@ export const NextRunAt: FC<NextRunAtProps> = ({ nextRunAt, timeZone }) => {
     return (
       <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <span className="text-lg flex-shrink-0">🔄</span>
+          <RefreshCw size={16} className="flex-shrink-0 text-orange-600 dark:text-orange-400" />
           <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">
             {t('reminder.updateAvailable')}
           </p>
@@ -62,7 +63,7 @@ export const NextRunAt: FC<NextRunAtProps> = ({ nextRunAt, timeZone }) => {
 
   return (
     <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 flex items-start gap-2">
-      <span className="text-lg flex-shrink-0 min-w-[1.5em]">⏰</span>
+      <Clock size={16} className="flex-shrink-0 text-blue-600 dark:text-blue-400 mt-[2px]" />
       <div className="flex-1 min-w-0">
         <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
           {t('reminder.nextFire')}:
