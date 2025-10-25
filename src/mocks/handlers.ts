@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { CreateReminderDto, UserReminderResponse, ReminderState, UpdateReminderDto, GetPagedUserRemindersQueryResponse, ReminderCreatedResponseDto, UpdateUserReminderCommandResponse, PauseUserReminderCommandResponse, ActivatePausedReminderCommandResponse, ConvertEndedReminderToDraftCommandResponse } from '@/api/types';
+import { CreateReminderDto, UserReminderResponse, ReminderState, UpdateReminderDto, GetPagedUserRemindersQueryResponse, ReminderCreatedResponseDto, UpdateUserReminderCommandResponse, PauseUserReminderCommandResponse, ActivatePausedReminderCommandResponse, ConvertEndedReminderToDraftCommandResponse, ReminderSortBy, SortOrder } from '@/api/types';
 import { remindersStore, addReminder, updateReminder, deleteReminder, getReminder } from './data';
 
 const API_BASE = '/v1';
@@ -10,11 +10,30 @@ export const handlers = [
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
+    const sortBy = (url.searchParams.get('sortBy') || ReminderSortBy.CreatedAt) as ReminderSortBy;
+    const order = (url.searchParams.get('order') || SortOrder.Desc) as SortOrder;
+
+    // Sort the reminders
+    const sortedReminders = [...remindersStore].sort((a, b) => {
+      let aValue: string;
+      let bValue: string;
+
+      if (sortBy === ReminderSortBy.CreatedAt) {
+        aValue = a.createdAt;
+        bValue = b.createdAt;
+      } else { // ReminderSortBy.ChangedAt
+        aValue = a.updatedAt;
+        bValue = b.updatedAt;
+      }
+
+      const comparison = aValue.localeCompare(bValue);
+      return order === SortOrder.Asc ? comparison : -comparison;
+    });
 
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    const paginatedReminders = remindersStore.slice(startIndex, endIndex);
-    const hasNext = endIndex < remindersStore.length;
+    const paginatedReminders = sortedReminders.slice(startIndex, endIndex);
+    const hasNext = endIndex < sortedReminders.length;
 
     const response: GetPagedUserRemindersQueryResponse = {
       reminders: paginatedReminders,

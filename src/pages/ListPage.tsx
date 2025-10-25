@@ -1,14 +1,20 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useInfiniteReminders } from '@/hooks/useReminders';
+import { useSortSettings } from '@/hooks/useSortSettings';
 import { ReminderCard } from '@/components/reminder/ReminderCard';
 import { SkeletonListPage, FadeIn } from '@/components/shared/Skeleton';
 import { Button } from '@/components/shared/Button';
+import { SortModal } from '@/components/modals/SortModal';
+import { ReminderSortBy, SortOrder } from '@/api/types';
 
 export const ListPage: FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { sortBy, order, updateSettings } = useSortSettings();
+  const [isSortModalOpen, setIsSortModalOpen] = useState(false);
+
   const {
     data,
     isLoading,
@@ -16,10 +22,14 @@ export const ListPage: FC = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteReminders();
+  } = useInfiniteReminders({ sortBy, order });
 
   const handleCreate = () => {
     navigate('/create');
+  };
+
+  const handleSort = (newSortBy: ReminderSortBy, newOrder: SortOrder) => {
+    updateSettings({ sortBy: newSortBy, order: newOrder });
   };
 
   // Flatten pages into a single array of reminders
@@ -48,7 +58,29 @@ export const ListPage: FC = () => {
             <h1 className="text-2xl font-bold text-[var(--tg-theme-text-color)]">
               {t('reminder.title')}
             </h1>
-            <Button onClick={handleCreate}>{t('common.create')}</Button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsSortModalOpen(true)}
+                className="px-3 py-2 rounded-lg bg-[var(--tg-theme-secondary-bg-color)] text-[var(--tg-theme-text-color)] hover:opacity-90 border border-[var(--tg-theme-hint-color)] transition-colors"
+                aria-label="Sort reminders"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"
+                  />
+                </svg>
+              </button>
+              <Button onClick={handleCreate}>{t('common.create')}</Button>
+            </div>
           </div>
 
           {reminders.length === 0 ? (
@@ -81,6 +113,14 @@ export const ListPage: FC = () => {
             </>
           )}
         </div>
+
+        <SortModal
+          isOpen={isSortModalOpen}
+          currentSortBy={sortBy}
+          currentOrder={order}
+          onApply={handleSort}
+          onClose={() => setIsSortModalOpen(false)}
+        />
       </div>
     </FadeIn>
   );

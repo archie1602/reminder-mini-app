@@ -180,6 +180,16 @@
     "leaveButton": "Leave",
     "stayButton": "Stay"
   },
+  "sort": {
+    "title": "Sort Reminders",
+    "sortBy": "Sort by",
+    "order": "Order",
+    "createdAt": "Creation Date",
+    "changedAt": "Last Modified",
+    "asc": "Ascending (Oldest First)",
+    "desc": "Descending (Newest First)",
+    "apply": "Apply"
+  },
   "indexPage": {
     "title": "Application Launch Data",
     "description": "These pages help developer to learn more about current launch information",
