@@ -17,7 +17,7 @@ import { NoSchedulesMessage } from '@/components/reminder/NoSchedulesMessage';
 import { FormValidationSummary } from '@/components/shared/FormValidationSummary';
 import { SkeletonForm, FadeIn } from '@/components/shared/Skeleton';
 import { RuleType, ReminderState } from '@/api/types';
-import { getDefaultTimezone, commonTimezones } from '@/utils/timezones';
+import { getDefaultTimezone, allTimezones } from '@/utils/timezones';
 import { hasValidationErrors } from '@/utils/formHelpers';
 import { canEditReminder, isScheduleExpired } from '@/utils/reminderHelpers';
 import dayjs from 'dayjs';
@@ -278,7 +278,8 @@ export const EditPage: FC = () => {
                   {...field}
                   value={field.value || ''}
                   label={t('reminder.timezone')}
-                  options={commonTimezones}
+                  options={allTimezones()}
+                  searchable={true}
                   disabled={true}
                 />
               )}

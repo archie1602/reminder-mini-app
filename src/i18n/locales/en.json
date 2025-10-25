@@ -21,7 +21,11 @@
     "pause": "Pause",
     "activate": "Activate",
     "continue": "Continue",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "search": "Search...",
+    "noResults": "No results found",
+    "close": "Close",
+    "select": "Select"
   },
   "reminder": {
     "title": "Reminders",

@@ -16,7 +16,7 @@ import { ScheduleEditor } from '@/components/reminder/ScheduleEditor';
 import { NoSchedulesMessage } from '@/components/reminder/NoSchedulesMessage';
 import { FormValidationSummary } from '@/components/shared/FormValidationSummary';
 import { RuleType } from '@/api/types';
-import { getDefaultTimezone, commonTimezones } from '@/utils/timezones';
+import { getDefaultTimezone, allTimezones } from '@/utils/timezones';
 import { hasValidationErrors } from '@/utils/formHelpers';
 import dayjs from 'dayjs';
 
@@ -120,6 +120,11 @@ export const CreatePage: FC = () => {
     });
   };
 
+  // Get timezone options (memoized)
+  const timezoneOptions = useMemo(() => {
+    return allTimezones();
+  }, []);
+
   return (
     <div className="min-h-screen bg-[var(--tg-theme-bg-color)] p-4 pb-20">
       <div className="max-w-2xl mx-auto">
@@ -150,7 +155,8 @@ export const CreatePage: FC = () => {
                 {...field}
                 value={field.value || ''}
                 label={t('reminder.timezone')}
-                options={commonTimezones}
+                options={timezoneOptions}
+                searchable={true}
               />
             )}
           />
