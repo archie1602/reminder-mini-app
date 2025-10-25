@@ -33,15 +33,18 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const variantStyles = {
     warning: {
       icon: AlertTriangle,
-      confirmBtn: 'bg-yellow-500 hover:bg-yellow-600',
+      iconColor: 'text-yellow-600 dark:text-yellow-400',
+      confirmBtn: 'bg-[var(--tg-theme-button-color)] hover:opacity-90',
     },
     danger: {
       icon: XCircle,
+      iconColor: 'text-red-600 dark:text-red-400',
       confirmBtn: 'bg-red-500 hover:bg-red-600',
     },
     info: {
       icon: Info,
-      confirmBtn: 'bg-blue-500 hover:bg-blue-600',
+      iconColor: 'text-blue-600 dark:text-blue-400',
+      confirmBtn: 'bg-[var(--tg-theme-button-color)] hover:opacity-90',
     },
   };
 
@@ -59,7 +62,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 m-4 max-w-md w-full max-h-[90vh] overflow-auto">
         {/* Header */}
         <div className="flex items-start mb-4">
-          <styles.icon size={24} className="flex-shrink-0 mr-3 mt-0.5" />
+          <styles.icon size={24} className={`flex-shrink-0 mr-3 mt-0.5 ${styles.iconColor}`} />
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             {title}
           </h2>
@@ -80,7 +83,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </button>
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 text-white rounded-lg transition-colors ${styles.confirmBtn}`}
+            className={`px-4 py-2 text-[var(--tg-theme-button-text-color)] rounded-lg transition-opacity ${styles.confirmBtn}`}
           >
             {finalConfirmText}
           </button>

@@ -321,20 +321,8 @@ export const EditPage: FC = () => {
 
             <FormValidationSummary errors={errors} isVisible={hasErrors} />
 
-            {!hasChanges && !hasErrors && (
-              <div className="text-sm text-[var(--tg-theme-hint-color)] text-center">
-                {t('reminder.noChangesDetected')}
-              </div>
-            )}
-
             <Button
-              onClick={() => {
-                if (!hasChanges) {
-                  alert(t('reminder.noChangesDetected'));
-                } else {
-                  handleSubmit(onSubmit)();
-                }
-              }}
+              onClick={handleSubmit(onSubmit)}
               disabled={hasErrors || updateMutation.isPending || !hasChanges}
               fullWidth
               title={!hasChanges ? t('reminder.noChangesDetected') : undefined}
