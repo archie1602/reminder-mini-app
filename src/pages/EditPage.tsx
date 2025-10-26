@@ -17,6 +17,7 @@ import { ScheduleEditor } from '@/components/reminder/ScheduleEditor';
 import { NoSchedulesMessage } from '@/components/reminder/NoSchedulesMessage';
 import { FormValidationSummary } from '@/components/shared/FormValidationSummary';
 import { SkeletonForm, FadeIn } from '@/components/shared/Skeleton';
+import { ErrorState } from '@/components/ErrorState';
 import { RuleType, ReminderState } from '@/api/types';
 import { getDefaultTimezone, allTimezones } from '@/utils/timezones';
 import { hasValidationErrors } from '@/utils/formHelpers';
@@ -29,7 +30,7 @@ export default function EditPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { data: reminder, isLoading } = useReminder(id!);
+  const { data: reminder, isLoading, error } = useReminder(id!);
   const updateMutation = useUpdateReminder();
   const [originalFormData, setOriginalFormData] = useState<CreateReminderFormData | null>(null);
   const [originalScheduleIds, setOriginalScheduleIds] = useState<string[]>([]);
@@ -230,11 +231,42 @@ export default function EditPage() {
     });
   };
 
-  if (isLoading || !reminder) {
+  // Handle loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-[var(--tg-theme-bg-color)] p-4 pb-20">
         <div className="max-w-2xl mx-auto">
           <SkeletonForm />
+        </div>
+      </div>
+    );
+  }
+
+  // Handle error state (e.g., 404 when reminder is deleted)
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[var(--tg-theme-bg-color)] p-4 pb-20">
+        <div className="max-w-2xl mx-auto">
+          <ErrorState
+            error={error}
+            context="edit"
+            showBackButton={true}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Handle case where data loaded but no reminder found
+  if (!reminder) {
+    return (
+      <div className="min-h-screen bg-[var(--tg-theme-bg-color)] p-4 pb-20">
+        <div className="max-w-2xl mx-auto">
+          <ErrorState
+            error={{ message: t('errors.reminderNotFound') }}
+            context="edit"
+            showBackButton={true}
+          />
         </div>
       </div>
     );

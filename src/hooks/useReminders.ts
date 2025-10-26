@@ -3,6 +3,8 @@ import { remindersApi, GetRemindersParams } from '@/api/reminders';
 import { CreateReminderDto, UpdateReminderDto } from '@/api/types';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { getMutationErrorMessage, ErrorCode, extractErrorDetails } from '@/utils/errorHelpers';
 
 export const REMINDERS_QUERY_KEY = ['reminders'];
 
@@ -46,8 +48,9 @@ export const useCreateReminder = () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
       toast.success(t('toast.createSuccess'));
     },
-    onError: () => {
-      toast.error(t('toast.error'));
+    onError: (error) => {
+      const message = getMutationErrorMessage(error, 'create', t);
+      toast.error(message);
     },
   });
 };
@@ -55,6 +58,7 @@ export const useCreateReminder = () => {
 export const useUpdateReminder = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateReminderDto }) =>
@@ -63,8 +67,15 @@ export const useUpdateReminder = () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
       toast.success(t('toast.updateSuccess'));
     },
-    onError: () => {
-      toast.error(t('toast.error'));
+    onError: (error) => {
+      const details = extractErrorDetails(error);
+      const message = getMutationErrorMessage(error, 'update', t);
+      toast.error(message);
+
+      // If reminder was deleted, navigate back to list
+      if (details.errorCode === ErrorCode.REMINDER_NOT_FOUND) {
+        setTimeout(() => navigate('/'), 2000);
+      }
     },
   });
 };
@@ -79,8 +90,9 @@ export const useDeleteReminder = () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
       toast.success(t('toast.deleteSuccess'));
     },
-    onError: () => {
-      toast.error(t('toast.error'));
+    onError: (error) => {
+      const message = getMutationErrorMessage(error, 'delete', t);
+      toast.error(message);
     },
   });
 };
@@ -93,10 +105,11 @@ export const usePauseReminder = () => {
     mutationFn: (id: string) => remindersApi.pause(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
-      toast.success(t('toast.statusChangeSuccess'));
+      toast.success(t('toast.pauseSuccess'));
     },
-    onError: () => {
-      toast.error(t('toast.error'));
+    onError: (error) => {
+      const message = getMutationErrorMessage(error, 'pause', t);
+      toast.error(message);
     },
   });
 };
@@ -109,10 +122,11 @@ export const useActivateReminder = () => {
     mutationFn: (id: string) => remindersApi.activate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
-      toast.success(t('toast.statusChangeSuccess'));
+      toast.success(t('toast.activateSuccess'));
     },
-    onError: () => {
-      toast.error(t('toast.error'));
+    onError: (error) => {
+      const message = getMutationErrorMessage(error, 'activate', t);
+      toast.error(message);
     },
   });
 };
@@ -125,10 +139,11 @@ export const useConvertToDraft = () => {
     mutationFn: (id: string) => remindersApi.convertToDraft(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REMINDERS_QUERY_KEY });
-      toast.success(t('toast.statusChangeSuccess'));
+      toast.success(t('toast.draftSuccess'));
     },
-    onError: () => {
-      toast.error(t('toast.error'));
+    onError: (error) => {
+      const message = getMutationErrorMessage(error, 'draft', t);
+      toast.error(message);
     },
   });
 };
