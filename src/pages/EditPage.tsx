@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
@@ -25,7 +25,7 @@ import dayjs from 'dayjs';
 
 const MAX_SCHEDULES = 5;
 
-export const EditPage: FC = () => {
+export default function EditPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -334,4 +334,4 @@ export const EditPage: FC = () => {
       </div>
     </FadeIn>
   );
-};
+}

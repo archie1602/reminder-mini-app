@@ -1,8 +1,12 @@
 import type { ComponentType, JSX } from 'react';
+import { lazy } from 'react';
 
+// Entry point page - bundled immediately (always visited)
 import { ListPage } from '@/pages/ListPage';
-import { CreatePage } from '@/pages/CreatePage';
-import { EditPage } from '@/pages/EditPage';
+
+// Secondary pages - lazy loaded (visited less frequently)
+const CreatePage = lazy(() => import('@/pages/CreatePage'));
+const EditPage = lazy(() => import('@/pages/EditPage'));
 
 interface Route {
   path: string;

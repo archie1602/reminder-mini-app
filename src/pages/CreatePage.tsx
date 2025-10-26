@@ -1,4 +1,4 @@
-import { FC, useMemo, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
@@ -23,7 +23,7 @@ import dayjs from 'dayjs';
 
 const MAX_SCHEDULES = 5;
 
-export const CreatePage: FC = () => {
+export default function CreatePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const createMutation = useCreateReminder();
@@ -207,4 +207,4 @@ export const CreatePage: FC = () => {
       </div>
     </div>
   );
-};
+}
